@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590399228771",
+    "project_id": "vt-partner-8317b",
+    "storage_bucket": "vt-partner-8317b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590399228771:android:ed8c950de6a42bc25fe156",
+        "android_client_info": {
+          "package_name": "com.tejasvicastautomationpvtltd.vt_partner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ7ttzeTq4_yjghsU_I8ObU_sj28tLbME"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
