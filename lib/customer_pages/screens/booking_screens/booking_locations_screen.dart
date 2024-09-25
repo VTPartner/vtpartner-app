@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/customer_pages/screens/pickup_location/pickup_location_screen.dart';
 import 'package:vt_partner/global/map_key.dart';
@@ -37,7 +39,7 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
   String sessionToken = "1234556";
   List<PredictedPlaces> _placesPredictedList = [];
   var hideSuggestion = false;
-
+  var isLoading = false;
   @override
   void initState() {
     super.initState();
@@ -99,7 +101,9 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
         automaticallyImplyLeading: false,
         toolbarHeight: 0,
       ),
-      body: Column(
+      body: isLoading == true
+          ? Center(child: CircularProgressIndicator())
+          : Column(
         children: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
@@ -331,18 +335,23 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
                         )
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.add_circle_outline),
-                          SizedBox(
-                            width: 5.0,
-                          ),
-                          DescriptionText(descriptionText: 'ADD STOPS')
-                        ],
-                      ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.pushNamed(context, AddStopsRoute);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.add_circle_outline),
+                                  SizedBox(
+                                    width: 5.0,
+                                  ),
+                                  DescriptionText(descriptionText: 'ADD STOPS')
+                                ],
+                              ),
+                            ),
                     )
                   ],
                 ),
@@ -432,7 +441,7 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
                               directions.locationName =
                                   responseApi["result"]["formatted_address"];
                           print(
-                              "Selected Pickup Location Name::${directions.locationName!.toString()}");
+                                    "Selected Drop Location Name::${directions.locationName!.toString()}");
                           directions.locationLatitude = responseApi["result"]
                               ["geometry"]["location"]["lat"];
                           directions.locationLongitude = responseApi["result"]
@@ -440,6 +449,8 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
 
                           Provider.of<AppInfo>(context, listen: false)
                               .updateDropOfLocationAddress(directions);
+                                Navigator.pushNamed(
+                                    context, DropLocateOnMapRoute);
                         } else {
                           if (kDebugMode) {
                             print("PLace Id details not found");
@@ -502,7 +513,7 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               InkWell(
-                onTap: () {
+                onTap: () async {
                   Navigator.pushNamed(context, DropLocateOnMapRoute);
                 },
                 child: Row(
@@ -527,4 +538,6 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
       ),
     );
   }
+
+
 }

@@ -80,11 +80,13 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
   late LatLng _userLocation;
   bool _locationInitialized = false;
 
+
   @override
   void initState() {
     super.initState();
     // Provider.of<AppInfo>(context,listen: false).receiverContactDetail = null;
-    _currentPosition = _kGooglePlex;
+    //_currentPosition = _kGooglePlex;
+    print("Init Drop Location");
     _setUserLocationMarker();
   }
 
@@ -99,15 +101,53 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
         desiredAccuracy: LocationAccuracy.high);
   }
 
+  AppInfo? appInfo;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Access the inherited widget here
+    appInfo = Provider.of<AppInfo?>(context, listen: false);
+  }
+
+
   Future<void> _setUserLocationMarker() async {
+    
     getUserCurrentLocation().then((value) async {
-      print(value.latitude.toString() + " " + value.longitude.toString());
+      if (appInfo?.userDropOfLocation != null) {
+        var locationLatitude = appInfo?.userDropOfLocation!.locationLatitude;
+        var locationLongitude = appInfo?.userDropOfLocation!.locationLongitude;
+        final userLocation = LatLng(locationLatitude!, locationLongitude!);
+        setState(() {
+          _userLocation = userLocation;
+          _currentPosition = CameraPosition(
+            target: _userLocation,
+            zoom: 10.0,
+          );
+          _locationInitialized = true;
+        });
+        CameraPosition cameraPosition = CameraPosition(
+            target: LatLng(locationLatitude, locationLongitude), zoom: 110);
+
+        final GoogleMapController controller = await _controller.future;
+
+        controller
+            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+        setState(() {});
+        return;
+      }
+
+      print("Drop Location::" +
+          value.latitude.toString() +
+          " " +
+          value.longitude.toString());
       final userLocation = LatLng(value.latitude, value.longitude);
       setState(() {
         _userLocation = userLocation;
         _currentPosition = CameraPosition(
           target: _userLocation,
-          zoom: 14.0,
+          zoom: 10.0,
         );
         _locationInitialized = true;
       });
@@ -121,6 +161,8 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
 
       setState(() {});
     });
+    
+    
   }
 
   bool _showBottomSheet = true;
@@ -382,10 +424,14 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
                     child: InkWell(
                       onTap: () {
                         Navigator.pushReplacementNamed(
-                            context, SelectVehiclesRoute);
+                                    context, PickToDropPolyLineMapRoute);
                       },
                       child: Ink(
                         decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/buttton_bg.png"),
+                                      fit: BoxFit.cover),
                           color: ThemeClass.facebookBlue,
                           borderRadius: BorderRadius.circular(16.0),
                         ),
@@ -398,7 +444,7 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
                                 Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Text(
-                                    'Verify and Continue',
+                                            'Verify',
                                     style: nunitoSansStyle.copyWith(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -420,6 +466,7 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
           ],
         ),
       ): null
+    
     );
   }
 }

@@ -15,5 +15,14 @@ const String BookingReviewDetailsRoute = "booking_review";
 const String PickUpAddressRoute = "pickup_address";
 const String SenderContactRoute = "sender_contacts";
 const String ReceiverContactRoute = "receiver_contacts";
+const String AddStopsRoute = "add_stops";
+const String PickToDropPolyLineMapRoute = "polyline_route";
+const String GoodsTypeRoute = "goods_type";
+const String CouponsRoute = "coupons";
+const String BookingSearchDriverRoute = "driver_search";
+const String BookingSuccessScreenRoute = "booking_success";
 
 
+//Agent Routes
+const String AgentHomeScreenRoute = "agent_home";
+const String AgentSettingsRoute = "agent_settings";

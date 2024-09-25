@@ -1,8 +1,10 @@
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/global/map_key.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
 import 'package:vt_partner/models/contact_model.dart';
+import 'package:vt_partner/models/direction_details_info.dart';
 import 'package:vt_partner/models/directions.dart';
 import 'package:provider/provider.dart';
 import 'package:vt_partner/models/pickup_location_map_direction.dart';
@@ -98,5 +100,33 @@ class AssistantMethods {
       Provider.of<AppInfo>(context, listen: false)
           .updateReceiverContactDetails(receiverContactDetails);
     }
+  }
+
+  static Future<DirectionDetailsInfo?>
+      obtainOriginToDestinationDirectionDetails(
+          LatLng orginPosition, LatLng destinationPosition) async {
+    //https://developers.google.com/maps/documentation/directions/start
+    String url =
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${orginPosition.latitude},${orginPosition.longitude}&destination=${destinationPosition.latitude},${destinationPosition.longitude}&key=$mapKey";
+
+    var response = await RequestAssistant.receiveRequest(url);
+    if (response == "Error") {
+      return null;
+    }
+
+    DirectionDetailsInfo directionDetailsInfo = DirectionDetailsInfo();
+    directionDetailsInfo.e_points =
+        response["routes"][0]["overview_polyline"]["points"];
+    directionDetailsInfo.distance_text =
+        response["routes"][0]["legs"][0]["distance"]["text"];
+    directionDetailsInfo.distance_value =
+        response["routes"][0]["legs"][0]["distance"]["value"];
+
+    directionDetailsInfo.duration_text =
+        response["routes"][0]["legs"][0]["duration"]["text"];
+    directionDetailsInfo.duration_value =
+        response["routes"][0]["legs"][0]["duration"]["value"];
+
+    return directionDetailsInfo;
   }
 }

@@ -239,7 +239,6 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
           await AssistantMethods.searchAddressForGeographicCoOrdinates(
               position!, context);
       print("MyLocation::" + humanReadableAddress);
-      
     } catch (e) {
       setState(() {
         _address = "Error: ${e.toString()}";
@@ -311,6 +310,7 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
                       }
                     },
                   ),
+                
                 ),
                 isServiceProvided == true
                     ? SafeArea(

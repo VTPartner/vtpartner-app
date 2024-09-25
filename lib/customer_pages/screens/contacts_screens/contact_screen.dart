@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 
 class ContactsListScreen extends StatefulWidget {
+  const ContactsListScreen({super.key});
+
   @override
   _ContactsListScreenState createState() => _ContactsListScreenState();
 }

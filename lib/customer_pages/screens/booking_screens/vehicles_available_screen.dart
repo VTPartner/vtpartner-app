@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:vt_partner/routings/route_names.dart';
+import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/widgets/body_text1.dart';
 import 'package:vt_partner/widgets/description_text.dart';
 import 'package:vt_partner/widgets/dotted_vertical_divider.dart';
 import 'package:vt_partner/widgets/heading_text.dart';
+import 'package:vt_partner/widgets/sub_title_text.dart';
 
 class VehiclesAvailableScreen extends StatefulWidget {
   const VehiclesAvailableScreen({super.key});
@@ -14,10 +17,12 @@ class VehiclesAvailableScreen extends StatefulWidget {
 }
 
 class _VehiclesAvailableScreenState extends State<VehiclesAvailableScreen> {
+  int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
+        
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -55,110 +60,185 @@ class _VehiclesAvailableScreenState extends State<VehiclesAvailableScreen> {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Container(
-              decoration: BoxDecoration(color: Colors.white),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Container(
-                  width: width,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-                  ),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 5.0,
-                      ),
-                      Stack(
-                        children: [
-                        
-                          Row(
-                            children: [
-                              Column(
-                                children: [
-                                  Image.asset(
-                                    "assets/icons/green_dot.png",
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                  DottedVerticalDivider(
-                                    height: 44,
-                                    width: 1,
-                                    color: Colors.grey,
-                                    dotRadius: 1,
-                                    spacing: 5,
-                                  ),
-                                  Image.asset(
-                                    "assets/icons/red_dot.png",
-                                    width: 20,
-                                    height: 20,
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Pickup",
-                                    style: nunitoSansStyle.copyWith(
-                                        color: Colors.green[900],
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.fontSize),
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                  DescriptionText(
-                                      descriptionText:
-                                          "Shaheed Maniyar. 8296565587"),
-                                  SizedBox(
-                                    width: width - 80,
-                                    child: BodyText1(
-                                        text:
-                                            "Plot No 83, Gat 765 Industrial Area phase"),
-                                  ),
-                                  SizedBox(
-                                    height: kHeight,
-                                  ),
-                                  Text(
-                                    "Destination",
-                                    style: nunitoSansStyle.copyWith(
-                                        color: Colors.red,
-                                        fontSize: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.fontSize),
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                  DescriptionText(
-                                      descriptionText:
-                                          "Arun Patil - 7654343376"),
-                                  SizedBox(
-                                    width: width - 80,
-                                    child: BodyText1(
-                                        text:
-                                            "Q68R+PJ Ranjangaon, Ashtavinayak Mahamarg, Malthan Rd, Ranjangaon, Maharashtra 412209"),
-                                  ),
-                                ],
-                              )
-                            ],
+            SizedBox(
+              height: kHeight,
+            ),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: 15, // Change the item count as needed.
+                itemBuilder: (context, index) {
+                  return Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        setState(() {
+                          selectedIndex =
+                              index; // Update the selected index on tap.
+                        });
+                      },
+                      child: Ink(
+                          decoration: BoxDecoration(
+                            color: selectedIndex == index
+                                ? ThemeClass.facebookBlue.withOpacity(0.1)
+                                : Colors.white, // Highlight the selected item.
                           ),
-                        
-                        ],
-                      )
-                    ],
+                          child: Stack(
+                            children: [
+                              selectedIndex == index
+                                  ? Container(
+                                      width: 5,
+                                      height:
+                                          95, // Set to the same height as the column
+                                      decoration: BoxDecoration(
+                                          color: ThemeClass.facebookBlue,
+                                          borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(12.0),
+                                              bottomRight:
+                                                  Radius.circular(12.0))),
+                                    )
+                                  : SizedBox(),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 2.0, right: 2.0, bottom: 2.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                            
+                                    Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              width: kHeight,
+                                            ),
+                                            Image.asset(
+                                              "assets/images/vtp_partner_truck.png",
+                                              width: 80,
+                                              height: 80,
+                                            ),
+                                            SizedBox(
+                                              width: kHeight,
+                                            ),
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    DescriptionText(
+                                                        descriptionText:
+                                                            'Tata Ace'),
+                                                    SizedBox(
+                                                      width: 10,
+                                                    ),
+                                                    selectedIndex == index
+                                                        ? Icon(
+                                                            Icons.info_outline,
+                                                            size: 18,
+                                                          )
+                                                        : SizedBox(),
+                                                  ],
+                                                ),
+                                                SubTitleText(
+                                                    subTitle:
+                                                        '750 Kg . 3 Mins'),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: HeadingText(title: "Rs.2345/-"),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )),
+                    ),
+                  );
+                },
+              ),
+            ),
+            SizedBox(
+              height: kHeight + 100,
+            ),
+          ],
+        ),
+        bottomSheet: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 2,
+                blurRadius: 5,
+                offset: const Offset(0, -3),
+              ),
+            ],
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(8.0),
+              topRight: Radius.circular(8.0),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, BookingReviewDetailsRoute);
+                  },
+                  child: Ink(
+                    decoration: BoxDecoration(
+                      image: const DecorationImage(
+                          image: AssetImage("assets/images/buttton_bg.png"),
+                          fit: BoxFit.cover),
+                      color: ThemeClass.facebookBlue,
+                      borderRadius: BorderRadius.circular(16.0),
+                    ),
+                    child: Stack(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                'Proceed with Tata Ace',
+                                style: nunitoSansStyle.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  fontSize: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.fontSize,
+                                ),
+                                overflow: TextOverflow.visible,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
+        ));
+  
   }
 }

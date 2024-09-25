@@ -9,6 +9,11 @@ class AppInfo extends ChangeNotifier {
   Directions? userDropOfLocation;
   ContactModel? senderContactDetail;
   ContactModel? receiverContactDetail;
+
+
+  List<Directions> _destinations = [];
+
+  List<Directions> get destinations => _destinations;
   // PickUpLocationOnMap? pickUpLocationOnMap;
 
   void updateCustomerCurrentLocationAddress(Directions userCurrentAddress) {
@@ -39,5 +44,27 @@ class AppInfo extends ChangeNotifier {
   void updateReceiverContactDetails(ContactModel? contactModel) {
     receiverContactDetail = contactModel;
     notifyListeners();
+  }
+
+
+  void addDestination(Directions destination) {
+    if (_destinations.length < 3) {
+      _destinations.add(destination);
+      notifyListeners();
+    }
+  }
+
+  void updateDestination(int index, Directions newDestination) {
+    if (index >= 0 && index < _destinations.length) {
+      _destinations[index] = newDestination;
+      notifyListeners();
+    }
+  }
+
+  void removeDestination(int index) {
+    if (index >= 0 && index < _destinations.length) {
+      _destinations.removeAt(index);
+      notifyListeners();
+    }
   }
 }

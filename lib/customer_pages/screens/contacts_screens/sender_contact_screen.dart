@@ -128,6 +128,42 @@ class _SenderContactScreenState extends State<SenderContactScreen> {
           ),
         ),
         const SizedBox(height: 10),
+        Container(
+            color: Colors.white,
+            child: ListTile(
+              title: Text(
+                'Use My Number',
+                style: nunitoSansStyle.copyWith(
+                  color: Colors.black,
+                  fontSize: 14.0,
+                ),
+              ),
+              subtitle: Text(
+                '8296565587',
+                style: nunitoSansStyle.copyWith(
+                  color: Colors.grey,
+                  fontSize: 14.0,
+                ),
+              ),
+              leading: CircleAvatar(
+                  backgroundColor: ThemeClass
+                      .facebookBlue, // Set your desired background color
+                  child: Icon(
+                    Icons.person_3_outlined,
+                    color: Colors.white,
+                  )),
+              onTap: () async {
+                // Saving Sender Contact Details to Provider with the cleaned name
+                // AssistantMethods.saveReceiverContactDetails(
+                //   cleanedDisplayName, // Using the cleaned display name
+                //   phoneNumber,
+                //   context,
+                // );
+                Navigator.pop(context);
+              },
+            )),
+                                             
+        const SizedBox(height: 10),
         Expanded(
           child: _filteredContacts == null
               ? Center(child: CircularProgressIndicator())
@@ -187,14 +223,25 @@ class _SenderContactScreenState extends State<SenderContactScreen> {
                               style: nunitoSansStyle.copyWith(
                                   color: Colors.grey, fontSize: 14.0),
                             ),
-                            leading: Icon(
-                              Icons.phone_in_talk_rounded,
-                              color: ThemeClass.facebookBlue,
+                            leading: CircleAvatar(
+                              backgroundColor: ThemeClass
+                                  .facebookBlue, // Set your desired background color
+                              child: Text(
+                                getInitials(fullContact
+                                    .displayName), // Function to get initials
+                                style: TextStyle(
+                                  color:
+                                      Colors.white, // Text color for initials
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             onTap: () async {
                               //saving Sender Contact Details to Provider
+                              String cleanedDisplayName =
+                                  cleanDisplayName(fullContact.displayName);
                               AssistantMethods.saveSenderContactDetails(
-                                  fullContact.displayName,
+                                  cleanedDisplayName,
                                   phoneNumber,
                                   context);
                                   Navigator.pop(context);
@@ -215,4 +262,50 @@ class _SenderContactScreenState extends State<SenderContactScreen> {
       ],
     );
   }
+
+  String cleanDisplayName(String displayName) {
+    // Regular expression to match only alphanumeric characters and spaces
+    final alphanumeric = RegExp(r'[a-zA-Z0-9\s]');
+
+    // Replace all non-alphanumeric characters with an empty string
+    return displayName.runes
+        .map((int rune) => String.fromCharCode(rune))
+        .where((char) => alphanumeric.hasMatch(char))
+        .join()
+        .trim(); // Ensure no trailing spaces are left
+  }
+
+  String getInitials(String name) {
+    if (name == null || name.isEmpty) {
+      return ''; // Handle empty or null name case
+    }
+
+    // Split the name by spaces and filter out empty parts
+    List<String> nameParts =
+        name.trim().split(' ').where((part) => part.isNotEmpty).toList();
+
+    // Function to get the first valid alphanumeric character from each part
+    String getFirstLetter(String part) {
+      // Iterate over the runes (Unicode code points)
+      for (var rune in part.runes) {
+        String character = String.fromCharCode(rune);
+        if (RegExp(r'[a-zA-Z0-9]').hasMatch(character)) {
+          return character; // Return the first alphanumeric character
+        }
+      }
+      return ''; // Return empty string if no valid character found
+    }
+
+    // Extract the first valid letter from the first part of the name
+    String firstInitial =
+        nameParts.isNotEmpty ? getFirstLetter(nameParts[0]) : '';
+
+    // Extract the first valid letter from the second part of the name (if available)
+    String lastInitial =
+        nameParts.length > 1 ? getFirstLetter(nameParts[1]) : '';
+
+    // Return initials in uppercase (or a single valid letter if only one exists)
+    return (firstInitial + lastInitial).toUpperCase();
+  }
+
 }

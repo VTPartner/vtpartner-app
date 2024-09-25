@@ -18,7 +18,7 @@ class ThemeClass {
       statusBarColor:
           Colors.grey[100], // Set the notification tray color to facebookBlue
       statusBarIconBrightness:
-          Brightness.dark, // Set the icons to be light-colored
+          Brightness.light, // Set the icons to be light-colored
     ));
     return ThemeData(
       // Define the overall color scheme

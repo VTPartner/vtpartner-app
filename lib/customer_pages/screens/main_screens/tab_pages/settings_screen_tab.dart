@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/widgets/circular_network_image.dart';
@@ -263,6 +264,19 @@ class _SettingsScreenTabPageState extends State<SettingsScreenTabPage> {
                             icon: Icons.article_outlined,
                             title: 'Terms and Conditions',
                             onTap: () {}),
+                        Divider(
+                          color: Colors.grey,
+                          thickness: 0.1,
+                          indent: 70,
+                          endIndent: 20,
+                        ),
+                        SettingsMenuItems(
+                            icon: Icons.fire_truck_outlined,
+                            title: 'Register as a Partner',
+                            onTap: () {
+                              Navigator.pushNamed(
+                                  context, AgentHomeScreenRoute);
+                            }),
                         SizedBox(
                           height: kHeight,
                         )

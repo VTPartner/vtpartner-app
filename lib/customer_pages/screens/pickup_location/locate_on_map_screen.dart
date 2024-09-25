@@ -68,12 +68,22 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
   late LatLng _userLocation;
   bool _locationInitialized = false;
   String placeId = "";
+AppInfo? appInfo;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Access the inherited widget here
+    appInfo = Provider.of<AppInfo?>(context, listen: false);
+  }
+
 
   @override
   void initState() {
     super.initState();
     _currentPosition = _kGooglePlex;
-    _setUserLocationMarker();
+    print("init pickup location map");
+    _setUserLocationMarker(context);
   }
 
   Future<Position> getUserCurrentLocation() async {
@@ -87,8 +97,33 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
         desiredAccuracy: LocationAccuracy.high);
   }
 
-  Future<void> _setUserLocationMarker() async {
+  Future<void> _setUserLocationMarker(context) async {
     getUserCurrentLocation().then((value) async {
+
+      if (appInfo?.userPickupLocation != null) {
+        var locationLatitude = appInfo?.userPickupLocation!.locationLatitude;
+        var locationLongitude = appInfo?.userPickupLocation!.locationLongitude;
+        print("locationLng::$locationLongitude");
+        final userLocation = LatLng(locationLatitude!, locationLongitude!);
+        setState(() {
+          _userLocation = userLocation;
+          _locationInitialized = true;
+          _currentPosition = CameraPosition(
+            target: _userLocation,
+            zoom: 14.0,
+          );
+        });
+        CameraPosition cameraPosition = CameraPosition(
+            target: LatLng(locationLatitude, locationLongitude), zoom: 110);
+
+        final GoogleMapController controller = await _controller.future;
+        controller
+            .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+
+        setState(() {});
+        return;
+      }
+
       print(value.latitude.toString() + " " + value.longitude.toString());
       final userLocation = LatLng(value.latitude, value.longitude);
       setState(() {
@@ -104,11 +139,13 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
           target: LatLng(value.latitude, value.longitude), zoom: 110);
 
       final GoogleMapController controller = await _controller.future;
-
       controller.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
 
       setState(() {});
     });
+
+    
+    
   }
 
   onCameraMove(CameraPosition? position) {
@@ -155,17 +192,16 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
                 bottom: true,
                 child: Stack(
                   children: [
-                    if (_currentPosition != null)
-                      GoogleMap(
-                        initialCameraPosition: _currentPosition,
-                        mapType: MapType.normal,
-                        myLocationButtonEnabled: true,
-                        myLocationEnabled: true,
-                        onCameraMove: onCameraMove,
-                        onMapCreated: (GoogleMapController controller) {
-                          _controller.complete(controller);
-                        },
-                      ),
+                    GoogleMap(
+                      initialCameraPosition: _currentPosition,
+                      mapType: MapType.normal,
+                      myLocationButtonEnabled: true,
+                      myLocationEnabled: true,
+                      onCameraMove: onCameraMove,
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                    ),
                     if (_locationInitialized)
                       Positioned(
                         left: MediaQuery.of(context).size.width / 2 -
@@ -420,6 +456,10 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
                               },
                               child: Ink(
                                 decoration: BoxDecoration(
+                                  image: const DecorationImage(
+                                      image: AssetImage(
+                                          "assets/images/buttton_bg.png"),
+                                      fit: BoxFit.cover),
                                   color: ThemeClass.facebookBlue,
                                   borderRadius: BorderRadius.circular(16.0),
                                 ),

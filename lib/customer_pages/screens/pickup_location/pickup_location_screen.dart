@@ -275,7 +275,8 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
 
                           Provider.of<AppInfo>(context, listen: false)
                               .updatePickupLocationAddress(directions);
-                          
+                          Navigator.pushNamed(
+                              context, LocateOnMapPickupLocationRoute);
                         } else {
                           if (kDebugMode) {
                             print("PLace Id details not found");
@@ -283,14 +284,14 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
 
                           return;
                         }
-                        // setState(() {
-                        //   _controller.text =
-                        //       _placesPredictedList[index].description!;
-                        //   _placesPredictedList = [];
-                        //   hideSuggestion = false;
-                        //   FocusScope.of(context).unfocus();
-                        // });
-                        Navigator.pop(context);
+                        setState(() {
+                          _controller.text =
+                              _placesPredictedList[index].description!;
+                          _placesPredictedList = [];
+                          hideSuggestion = false;
+                          FocusScope.of(context).unfocus();
+                        });
+                        
                       },
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

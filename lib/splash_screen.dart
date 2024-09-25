@@ -44,9 +44,9 @@ class _MySplashScreenState extends State<MySplashScreen> {
       print("MyLocation::" + humanReadableAddress);
       
     } catch (e) {
-      setState(() {
-        // _address = "Error: ${e.toString()}";
-      });
+      
+      print("Error: ${e.toString()}");
+      
     }
   }
 
