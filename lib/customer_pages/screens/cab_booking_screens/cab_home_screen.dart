@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
@@ -12,16 +13,21 @@ import 'package:vt_partner/infoHandler/app_info.dart';
 import 'package:vt_partner/main.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
+import 'package:vt_partner/utils/app_colors.dart';
 import 'package:vt_partner/utils/app_styles.dart';
+import 'package:vt_partner/widgets/circular_network_image.dart';
+import 'package:vt_partner/widgets/google_textform.dart';
+import 'package:vt_partner/widgets/heading_text.dart';
+import 'package:vt_partner/widgets/round_textfield.dart';
 
-class AgentHomeScreen extends StatefulWidget {
-  const AgentHomeScreen({super.key});
+class CabHomeScreen extends StatefulWidget {
+  const CabHomeScreen({super.key});
 
   @override
-  State<AgentHomeScreen> createState() => _AgentHomeScreenState();
+  State<CabHomeScreen> createState() => _CabHomeScreenState();
 }
 
-class _AgentHomeScreenState extends State<AgentHomeScreen> {
+class _CabHomeScreenState extends State<CabHomeScreen> {
   final Completer<GoogleMapController> _controllerGoogleMap =
       Completer<GoogleMapController>();
 
@@ -206,7 +212,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
 
   Set<Marker> markersSet = {};
   BitmapDescriptor? customMarkerIcon;
-  
+
   double bottomPaddingOfMap = 0.0;
 
   locateUserPosition() async {
@@ -214,8 +220,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
         desiredAccuracy: LocationAccuracy.high);
     driverCurrentPosition = cPosition;
 
-    LatLng latLngPosition =
-        LatLng(
+    LatLng latLngPosition = LatLng(
         driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
 
     CameraPosition cameraPosition =
@@ -245,7 +250,6 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
     );
   }
 
-
   checkIfLocationPermissionAllowed() async {
     _locationPermission = await Geolocator.requestPermission();
 
@@ -254,12 +258,11 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
     }
   }
 
-  
-
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+
     setCustomMarkerIcon();
     checkIfLocationPermissionAllowed();
   }
@@ -268,7 +271,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
   @override
   void dispose() {
     // Cancel the position stream subscription
-
+    streamSubscriptionPosition?.cancel();
     newGoogleMapController?.dispose();
     super.dispose();
   }
@@ -276,54 +279,10 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
   double searchLocationContainerHeight = 220.0;
   bool isOnline = false; // Default state
 
-  void _toggleSwitch(bool value) {
-    // Show confirmation dialog before toggling
-    showCupertinoDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (BuildContext context) {
-        return CupertinoAlertDialog(
-          title: Text('Change Status'),
-          content: Text(value
-              ? 'Do you want to go online?'
-              : 'Do you want to go offline?'),
-          actions: [
-            CupertinoDialogAction(
-              child: Text(
-                'Cancel',
-                style: nunitoSansStyle.copyWith(color: Colors.white),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-            CupertinoDialogAction(
-              child: Text(
-                'Confirm',
-                style: nunitoSansStyle.copyWith(
-                    color: isOnline ? Colors.red : Colors.green),
-              ),
-              onPressed: () {
-                setState(() {
-                  isOnline = value; // Update the state
-                });
-                if (isOnline) {
-                  driverIsOnlineNow(); //Updating Driver Current Location and Searching for new ride requests
-                  updateDriversLocationAtRealTime(); // It will start sending realtime lat lng
-                } else {
-                  driverIsOfflineNow();
-                }
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    var appInfo = Provider.of<AppInfo>(context);
+
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -350,7 +309,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
                     //blackThemeController();
 
                     setState(() {
-                      bottomPaddingOfMap = 10;
+                      bottomPaddingOfMap = 120.0;
                     });
                     //Get Users Current Location
                     locateUserPosition();
@@ -361,112 +320,82 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 8.0, vertical: 4.0),
-                  child: Column(
-                    children: [
-                      Container(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(25.0)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Icon(
+                              Icons.menu,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        CircularNetworkImage(
+                            radius: 25,
+                            imageUrl:
+                                'https://preview.keenthemes.com/metronic-v4/theme_rtl/assets/pages/media/profile/profile_user.jpg')
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 10,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(
+                            context, CabDestinationLocationSearchRoute);
+                      },
+                      child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(12.0),
-                                topRight: Radius.circular(12.0)),
-                            color: Colors.white),
+                          borderRadius: BorderRadius.circular(6.0),
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.grey.withOpacity(0.7), // Shadow color
+                              offset: Offset(0, 3),
+                              blurRadius: 2,
+                            ),
+                          ],
+                        ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 8.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              IconButton(
-                                onPressed: () {
-                                  //Show Drawer screen here
-                                  Navigator.pushNamed(
-                                      context, AgentSettingsRoute);
-                                },
-                                icon: Icon(
-                                  Icons.menu_outlined,
-                                  color: Colors.black,
-                                ),
+                              Icon(
+                                Icons.search,
+                                color: ThemeClass.facebookBlue,
                               ),
-                              const SizedBox(
-                                width: 5.0,
+                              SizedBox(
+                                width: 15.0,
                               ),
-                              Ink(
-                                width: _width - 180,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      "Hello, Justin",
-                                      style: nunitoSansStyle.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                          fontSize: 16.5),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Switch(
-                                value: isOnline,
-                                onChanged: _toggleSwitch,
-                                activeColor:
-                                    Colors.green, // Color when switch is on
-                                inactiveThumbColor:
-                                    Colors.red, // Color when switch is off
+                              Text(
+                                'Where are you going ?',
+                                style: nunitoSansStyle.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                    fontSize: 16.0),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
                         ),
                       ),
-                      Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(12.0),
-                                bottomRight: Radius.circular(12.0)),
-                            color: isOnline ? Colors.green : Colors.red),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0, vertical: 8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Ink(
-                                width: _width - 120,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          isOnline ? Icons.login : Icons.logout,
-                                          color: Colors.white,
-                                        ),
-                                        SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          isOnline
-                                              ? "You are Online Now"
-                                              : "You are Offline Now",
-                                          style: nunitoSansStyle.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              fontSize: 14.5),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -477,20 +406,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
     );
   }
 
-  driverIsOnlineNow() async {
-    Position pos = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
-    driverCurrentPosition = pos;
-    //Update driver Status to Online and send his lat and lng where driver_id
-    var latitude = driverCurrentPosition!.latitude;
-    var longitude = driverCurrentPosition!.longitude;
-    print("driver lat::$latitude");
-    print("driver lng::$longitude");
-
-    //And he is searching for a new ride . But first check his current status in backend
-  }
-
-  updateDriversLocationAtRealTime() {
+  updateUsersLocationAtRealTime() {
     streamSubscriptionPosition =
         Geolocator.getPositionStream().listen((Position position) {
       driverCurrentPosition = position;
@@ -504,20 +420,12 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
           driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
       var latitude = driverCurrentPosition!.latitude;
       var longitude = driverCurrentPosition!.longitude;
-      print("driver cur_lat::$latitude");
-      print("driver cur_lng::$longitude");
+      print("cab user cur_lat::$latitude");
+      print("cab user cur_lng::$longitude");
 
       if (newGoogleMapController != null) {
         newGoogleMapController!.animateCamera(CameraUpdate.newLatLng(latLng));
       }
-    });
-  }
-
-  driverIsOfflineNow() {
-    //Async to make him go offline
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      streamSubscriptionPosition?.cancel();
-      // MyApp.restartApp(context);
     });
   }
 }

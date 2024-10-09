@@ -27,6 +27,8 @@ class AssistantMethods {
 
       Provider.of<AppInfo>(context, listen: false)
           .updateCustomerCurrentLocationAddress(userPickUpAddress);
+    } else {
+      searchAddressForGeographicCoOrdinates(position, context);
     }
     return humanReadableAddress;
   }

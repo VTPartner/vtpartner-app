@@ -433,4 +433,5 @@ class _BookingSearchDriverScreenState extends State<BookingSearchDriverScreen> {
       );
     });
   }
+
 }

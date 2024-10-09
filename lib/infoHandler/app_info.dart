@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:vt_partner/models/contact_model.dart';
 import 'package:vt_partner/models/directions.dart';
 import 'package:vt_partner/models/pickup_location_map_direction.dart';
+import 'package:vt_partner/models/stops.dart';
 
 class AppInfo extends ChangeNotifier {
   Directions? userCurrentLocation;
@@ -9,6 +10,7 @@ class AppInfo extends ChangeNotifier {
   Directions? userDropOfLocation;
   ContactModel? senderContactDetail;
   ContactModel? receiverContactDetail;
+  List<Stop>? userStopsList;
 
 
   List<Directions> _destinations = [];
@@ -33,6 +35,11 @@ class AppInfo extends ChangeNotifier {
 
   void updateDropOfLocationAddress(Directions? userDropOfAddress) {
     userDropOfLocation = userDropOfAddress;
+    notifyListeners();
+  }
+
+  void updateStopsList(List<Stop>? stops) {
+    userStopsList = stops;
     notifyListeners();
   }
 

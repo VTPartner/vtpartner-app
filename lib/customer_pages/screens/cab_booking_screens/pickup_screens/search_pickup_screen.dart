@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
@@ -22,14 +23,16 @@ import 'package:vt_partner/widgets/heading_text.dart';
 import 'package:vt_partner/widgets/main_heading_text.dart';
 import 'package:vt_partner/widgets/small_text.dart';
 
-class PickupLocationScreen extends StatefulWidget {
-  const PickupLocationScreen({super.key});
+class CabUserSearchPickupLocationScreen extends StatefulWidget {
+  const CabUserSearchPickupLocationScreen({super.key});
 
   @override
-  State<PickupLocationScreen> createState() => _PickupLocationScreenState();
+  State<CabUserSearchPickupLocationScreen> createState() =>
+      _CabUserSearchPickupLocationScreenState();
 }
 
-class _PickupLocationScreenState extends State<PickupLocationScreen> {
+class _CabUserSearchPickupLocationScreenState
+    extends State<CabUserSearchPickupLocationScreen> {
   TextEditingController _controller = TextEditingController();
   var uuid = Uuid();
   String sessionToken = "1234556";
@@ -87,7 +90,6 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,7 +133,7 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
                     controller: _controller,
                     decoration: InputDecoration(
                       prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      hintText: 'Where Can We Pick Up Your Package?',
+                      hintText: 'Search Your Pickup Location ',
                       border: InputBorder.none,
                       suffixIcon: _controller.text.isNotEmpty
                           ? IconButton(
@@ -265,7 +267,8 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
                           directions.locationId = placeId;
                           directions.locationName =
                               // responseApi["result"]["name"];
-                          directions.locationName = responseApi["result"]["formatted_address"];
+                              directions.locationName =
+                                  responseApi["result"]["formatted_address"];
                           print(
                               "Selected Pickup Location Name::${directions.locationName!.toString()}");
                           directions.locationLatitude = responseApi["result"]
@@ -276,7 +279,7 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
                           Provider.of<AppInfo>(context, listen: false)
                               .updatePickupLocationAddress(directions);
                           Navigator.pushNamed(
-                              context, LocateOnMapPickupLocationRoute);
+                              context, CabLocateOnMapPickupLocationRoute);
                         } else {
                           if (kDebugMode) {
                             print("PLace Id details not found");
@@ -291,7 +294,6 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
                           hideSuggestion = false;
                           FocusScope.of(context).unfocus();
                         });
-                        
                       },
                       title: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -340,7 +342,8 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
             children: [
               InkWell(
                 onTap: () {
-                  Navigator.pushNamed(context, LocateOnMapPickupLocationRoute);
+                  Navigator.pushNamed(
+                      context, CabLocateOnMapPickupLocationRoute);
                 },
                 child: Row(
                   children: [

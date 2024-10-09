@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
+import 'package:vt_partner/customer_pages/screens/pickup_location/locate_on_map_screen.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
@@ -168,19 +169,23 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
   bool _showBottomSheet = true;
 
   onCameraMove(CameraPosition? position) {
+    setState(() {
+      isLoading = true;
+    });
     if (position != null) {
-      final latitude = position.target.latitude;
-      final longitude = position.target.longitude;
+      _latitude = position.target.latitude;
+      _longitude = position.target.longitude;
 
       // Cancel any ongoing debounce calls
       if (_debounce?.isActive ?? false) _debounce?.cancel();
 
       // Set up a new debounce call
       _debounce = Timer(Duration(seconds: 1), () {
-        getAddressFromLatLng(latitude, longitude);
+        getAddressFromLatLng(_latitude, _longitude);
         setState(() {
           _showBottomSheet =
               true; // Show the bottom sheet when position is updated
+          isLoading = false;
         });
       });
 
@@ -188,6 +193,7 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
       if (_showBottomSheet) {
         setState(() {
           _showBottomSheet = false;
+          isLoading = true;
         });
       }
     }
@@ -198,6 +204,9 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
     _debounce?.cancel();
     super.dispose();
   }
+
+  double _latitude = 0.0;
+  double _longitude = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -235,6 +244,13 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
                         height: 45,
                       ),
                     ),
+                    Positioned(
+                        left: 0,
+                        right: 0,
+                        top: MediaQuery.of(context).size.height / 2 -
+                            80, // Adjust for tooltip position
+                        child: CustomTooltip(
+                            message: 'This is your Drop Location')),
                   SafeArea(
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -422,9 +438,16 @@ class _DropLocationLocateOnMapState extends State<DropLocationLocateOnMap> {
                 : Material(
                     color: Colors.transparent,
                     child: InkWell(
-                      onTap: () {
-                        Navigator.pushReplacementNamed(
+                              onTap: () async {
+                                if (_latitude != 0.0 || _longitude != 0.0) {
+                                  await getAddressFromLatLng(
+                                      _latitude, _longitude);
+                                  Navigator.pushReplacementNamed(
                                     context, PickToDropPolyLineMapRoute);
+                                } else {
+                                  print("LatLng Error");
+                                }
+                        
                       },
                       child: Ink(
                         decoration: BoxDecoration(

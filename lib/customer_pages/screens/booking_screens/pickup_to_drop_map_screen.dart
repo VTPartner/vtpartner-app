@@ -85,278 +85,272 @@ class _PickToDropPolyLineMapScreenState
         ),
         body: isLoading == true
             ? Center(child: CircularProgressIndicator())
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 2,
-                            blurRadius: 5,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.arrow_back,
-                              color: Colors.black,
-                              size: 20,
-                            ),
-                          ),
-                          HeadingText(title: 'Location Navigation'),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(color: Colors.white),
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          left: 16.0,
-                          right: 16.0,
-                          bottom: 16.0,
+            : Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 2,
+                          blurRadius: 5,
+                          offset: const Offset(0, 3),
                         ),
-                        child: Container(
-                          width: width,
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(12.0)),
-                          ),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Row(
-                                children: [
-                                  Column(
-                                    children: [
-                                      Image.asset(
-                                        "assets/icons/green_dot.png",
-                                        width: 20,
-                                        height: 20,
-                                      ),
-                                      DottedVerticalDivider(
-                                        height: 44,
-                                        width: 1,
-                                        color: Colors.grey,
-                                        dotRadius: 1,
-                                        spacing: 5,
-                                      ),
-                                      Image.asset(
-                                        "assets/icons/red_dot.png",
-                                        width: 20,
-                                        height: 20,
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      SizedBox(
-                                        width: width -
-                                            80, // Takes the full width of the parent
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "Pickup Location",
-                                              style: nunitoSansStyle.copyWith(
-                                                  color: Colors.green[900],
-                                                  fontSize: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.fontSize),
-                                              overflow: TextOverflow.visible,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      DescriptionText(
-                                          descriptionText:
-                                              "Shaheed . 8296565587"),
-                                      SizedBox(
-                                        width: width - 80,
-                                        child: BodyText1(
-                                            text: Provider.of<AppInfo>(context)
-                                                        .userPickupLocation !=
-                                                    null
-                                                ? Provider.of<AppInfo>(context)
-                                                    .userPickupLocation!
-                                                    .locationName!
-                                                : Provider.of<AppInfo>(context)
-                                                            .userCurrentLocation !=
-                                                        null
-                                                    ? Provider.of<AppInfo>(
-                                                            context)
-                                                        .userCurrentLocation!
-                                                        .locationName!
-                                                    : "Error Loading Your Location"),
-                                      ),
-                                      SizedBox(
-                                        height: kHeight,
-                                      ),
-                                      SizedBox(
-                                        width: width -
-                                            80, // Takes the full width of the parent
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              "DropOff Location",
-                                              style: nunitoSansStyle.copyWith(
-                                                  color: Colors.green[900],
-                                                  fontSize: Theme.of(context)
-                                                      .textTheme
-                                                      .bodySmall
-                                                      ?.fontSize),
-                                              overflow: TextOverflow.visible,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      DescriptionText(
-                                          descriptionText: "Ravi . 789867545"),
-                                      SizedBox(
-                                        width: width - 80,
-                                        child: BodyText1(
-                                            text: Provider.of<AppInfo>(context)
-                                                        .userDropOfLocation !=
-                                                    null
-                                                ? Provider.of<AppInfo>(context)
-                                                    .userDropOfLocation!
-                                                    .locationName!
-                                                : "Please Select Destination before you proceed"),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                              SizedBox(
-                                height: kHeight,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.pushNamed(
-                                          context, AddStopsRoute);
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.add_circle_outline,
-                                            size: 18,
-                                          ),
-                                          SizedBox(
-                                            width: 5.0,
-                                          ),
-                                          DescriptionText(
-                                              descriptionText: 'ADD STOPS')
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  InkWell(
-                                    onTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 12.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.edit,
-                                            size: 18,
-                                          ),
-                                          SizedBox(
-                                            width: 5.0,
-                                          ),
-                                          DescriptionText(
-                                              descriptionText: 'Edit Locations')
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
+                      ],
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.black,
+                            size: 20,
                           ),
                         ),
-                      ),
+                        HeadingText(title: 'Location Navigation'),
+                      ],
                     ),
-                    SizedBox(height: kHeight),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(color: Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16.0,
+                        right: 16.0,
+                        bottom: 16.0,
+                      ),
                       child: Container(
+                        width: width,
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(26.0)),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(26.0),
-                          child: Stack(children: [
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(12.0)),
+                        ),
+                        child: Column(
+                          children: [
                             SizedBox(
-                              height: height - 450,
-                              child: GoogleMap(
-                                mapType: MapType.normal,
-                                myLocationEnabled: true,
-                                zoomGesturesEnabled: true,
-                                zoomControlsEnabled: true,
-                                initialCameraPosition: _kGooglePlex,
-                                polylines: polyLineSet,
-                                markers: markersSet,
-                                circles: circlesSet,
-                                onMapCreated:
-                                    (GoogleMapController controller) async {
-                                  _controllerGoogleMap.complete(controller);
-                                  newGoogleMapController = controller;
-                                  print("controller::::$controller");
-                                  print(
-                                      "newGoogleMapController::::$newGoogleMapController");
-
-                                  //for black theme google map
-                                  // blackThemeGoogleMap();
-
-                                  setState(() {
-                                    bottomPaddingOfMap = 240;
-                                  });
-
-                                  locateUserPosition();
-                                },
-                              ),
+                              height: 5.0,
                             ),
-                          ]),
+                            Row(
+                              children: [
+                                Column(
+                                  children: [
+                                    Image.asset(
+                                      "assets/icons/green_dot.png",
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                    DottedVerticalDivider(
+                                      height: 44,
+                                      width: 1,
+                                      color: Colors.grey,
+                                      dotRadius: 1,
+                                      spacing: 5,
+                                    ),
+                                    Image.asset(
+                                      "assets/icons/red_dot.png",
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: width -
+                                          80, // Takes the full width of the parent
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "Pickup Location",
+                                            style: nunitoSansStyle.copyWith(
+                                                color: Colors.green[900],
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.fontSize),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    DescriptionText(
+                                        descriptionText:
+                                            "Shaheed . 8296565587"),
+                                    SizedBox(
+                                      width: width - 80,
+                                      child: BodyText1(
+                                          text: Provider.of<AppInfo>(context)
+                                                      .userPickupLocation !=
+                                                  null
+                                              ? Provider.of<AppInfo>(context)
+                                                  .userPickupLocation!
+                                                  .locationName!
+                                              : Provider.of<AppInfo>(context)
+                                                          .userCurrentLocation !=
+                                                      null
+                                                  ? Provider.of<AppInfo>(
+                                                          context)
+                                                      .userCurrentLocation!
+                                                      .locationName!
+                                                  : "Error Loading Your Location"),
+                                    ),
+                                    SizedBox(
+                                      height: kHeight,
+                                    ),
+                                    SizedBox(
+                                      width: width -
+                                          80, // Takes the full width of the parent
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "DropOff Location",
+                                            style: nunitoSansStyle.copyWith(
+                                                color: Colors.green[900],
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodySmall
+                                                    ?.fontSize),
+                                            overflow: TextOverflow.visible,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    DescriptionText(
+                                        descriptionText: "Ravi . 789867545"),
+                                    SizedBox(
+                                      width: width - 80,
+                                      child: BodyText1(
+                                          text: Provider.of<AppInfo>(context)
+                                                      .userDropOfLocation !=
+                                                  null
+                                              ? Provider.of<AppInfo>(context)
+                                                  .userDropOfLocation!
+                                                  .locationName!
+                                              : "Please Select Destination before you proceed"),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            SizedBox(
+                              height: kHeight,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, AddStopsRoute);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.add_circle_outline,
+                                          size: 18,
+                                        ),
+                                        SizedBox(
+                                          width: 5.0,
+                                        ),
+                                        DescriptionText(
+                                            descriptionText: 'ADD STOPS')
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(top: 12.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.edit,
+                                          size: 18,
+                                        ),
+                                        SizedBox(
+                                          width: 5.0,
+                                        ),
+                                        DescriptionText(
+                                            descriptionText: 'Edit Locations')
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
                         ),
                       ),
-                    )
-                  
-                  ],
-                ),
+                    ),
+                  ),
+                  SizedBox(height: kHeight),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(26.0)),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(26.0),
+                        child: Stack(children: [
+                          SizedBox(
+                            height: height - 450,
+                            child: GoogleMap(
+                              mapType: MapType.normal,
+                              myLocationEnabled: true,
+                              zoomGesturesEnabled: true,
+                              zoomControlsEnabled: true,
+                              initialCameraPosition: _kGooglePlex,
+                              polylines: polyLineSet,
+                              markers: markersSet,
+                              circles: circlesSet,
+                              onMapCreated:
+                                  (GoogleMapController controller) async {
+                                _controllerGoogleMap.complete(controller);
+                                newGoogleMapController = controller;
+                                print("controller::::$controller");
+                                print(
+                                    "newGoogleMapController::::$newGoogleMapController");
+
+                                //for black theme google map
+                                // blackThemeGoogleMap();
+
+                                setState(() {
+                                  bottomPaddingOfMap = 240;
+                                });
+
+                                locateUserPosition();
+                              },
+                            ),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  )
+                ],
               ),
         bottomSheet: isLoading
             ? null

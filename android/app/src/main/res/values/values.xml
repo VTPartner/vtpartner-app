@@ -1,3 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="default_web_client_id" translatable="false">590399228771-56bagn674t127um25rbp5toumtpk35e8.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">590399228771</string>
+    <string name="google_api_key" translatable="false">AIzaSyDQ7ttzeTq4_yjghsU_I8ObU_sj28tLbME</string>
+    <string name="google_app_id" translatable="false">1:590399228771:android:ed8c950de6a42bc25fe156</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyDQ7ttzeTq4_yjghsU_I8ObU_sj28tLbME</string>
+    <string name="project_id" translatable="false">vt-partner-8317b</string>
 </resources>

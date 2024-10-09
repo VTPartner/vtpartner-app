@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
+import 'package:vt_partner/customer_pages/screens/booking_screens/add_stops_screen.dart';
 import 'package:vt_partner/customer_pages/screens/pickup_location/pickup_location_screen.dart';
 import 'package:vt_partner/global/map_key.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
@@ -104,75 +105,77 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
       body: isLoading == true
           ? Center(child: CircularProgressIndicator())
           : Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Row(
               children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: Icon(
-                    Icons.arrow_back,
-                    color: Colors.black,
-                    size: 20,
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(
+                          Icons.arrow_back,
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                      ),
+                      HeadingText(title: 'Select Booking Addresses'),
+                    ],
                   ),
                 ),
-                HeadingText(title: 'Select Booking Addresses'),
-              ],
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(color: Colors.white),
-            child: Padding(
-              padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
-                bottom: 16.0,
-              ),
-              child: Container(
-                width: width,
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(12.0)),
-                ),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 5.0,
+                Container(
+                  decoration: BoxDecoration(color: Colors.white),
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 16.0,
+                      right: 16.0,
+                      bottom: 16.0,
                     ),
-                    Row(
-                      children: [
-                        Column(
-                          children: [
-                            Image.asset(
-                              "assets/icons/green_dot.png",
-                              width: 20,
-                              height: 20,
-                            ),
-                            DottedVerticalDivider(
-                              height: 44,
-                              width: 1,
-                              color: Colors.grey,
-                              dotRadius: 1,
-                              spacing: 5,
-                            ),
-                            Image.asset(
-                              "assets/icons/red_dot.png",
-                              width: 20,
-                              height: 20,
+                    child: Container(
+                      width: width,
+                      decoration: BoxDecoration(
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(12.0)),
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 5.0,
+                          ),
+                          Row(
+                            children: [
+                              Column(
+                                children: [
+                                  Image.asset(
+                                    "assets/icons/green_dot.png",
+                                    width: 20,
+                                    height: 20,
+                                  ),
+                                  DottedVerticalDivider(
+                                    height: 44,
+                                    width: 1,
+                                    color: Colors.grey,
+                                    dotRadius: 1,
+                                    spacing: 5,
+                                  ),
+                                  Image.asset(
+                                    "assets/icons/red_dot.png",
+                                    width: 20,
+                                    height: 20,
                             ),
                           ],
                         ),
@@ -337,7 +340,8 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
                     ),
                           InkWell(
                             onTap: () {
-                              Navigator.pushNamed(context, AddStopsRoute);
+                              // Navigator.pushNamed(context, AddStopsRoute);
+                              
                             },
                             child: Padding(
                               padding: const EdgeInsets.only(top: 12.0),
@@ -353,6 +357,7 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
                               ),
                             ),
                     )
+                  
                   ],
                 ),
               ),
@@ -519,8 +524,8 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
                 child: Row(
                   children: [
                     Icon(
-                      Icons.pin_drop,
-                      size: 14,
+                      Icons.pin_drop_rounded,
+                      color: Colors.grey,
                     ),
                     SizedBox(
                       width: 10,
@@ -536,8 +541,10 @@ class _BookingLocationsScreenState extends State<BookingLocationsScreen> {
           ),
         ),
       ),
+    
     );
   }
 
 
 }
+

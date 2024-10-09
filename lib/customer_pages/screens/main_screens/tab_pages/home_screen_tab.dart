@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/customer_pages/screens/contacts_screens/contact_screen.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
+import 'package:vt_partner/main.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'dart:async';
@@ -238,7 +239,7 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
       String humanReadableAddress =
           await AssistantMethods.searchAddressForGeographicCoOrdinates(
               position!, context);
-      print("MyLocation::" + humanReadableAddress);
+      print("MyHomeLocation::" + humanReadableAddress);
     } catch (e) {
       setState(() {
         _address = "Error: ${e.toString()}";
@@ -259,13 +260,15 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
   }
 
   String _address = "Loading...";
+  AppInfo? appInfo;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
     checkIfLocationPermissionAllowed();
-    // _getUserLocationAndAddress();
+    _getUserLocationAndAddress();
+   
   }
 
   double searchLocationContainerHeight = 220.0;
@@ -273,6 +276,8 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
 
   @override
   Widget build(BuildContext context) {
+    appInfo = Provider.of<AppInfo>(context);
+    
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
     return Scaffold(
@@ -319,11 +324,20 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
                               horizontal: 8.0, vertical: 4.0),
                           child: Container(
                             decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: Colors.white),
+                              borderRadius: BorderRadius.circular(6.0),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black
+                                      .withOpacity(0.3), // Shadow color
+                                  offset: Offset(0, 2),
+                                  blurRadius: 2,
+                                ),
+                              ],
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8.0, vertical: 16.0),
+                                  horizontal: 8.0, vertical: 12.0),
                               child: Row(
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment:
@@ -530,8 +544,6 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
                                         onTap: () {
                                           Navigator.pushNamed(
                                               context, ServiceTypesRoute);
-                  //                         Navigator.of(context).push(
-                  // MaterialPageRoute(builder: (_) => ContactsListScreen()));
                                         },
                                         child: Column(
                                           children: [
@@ -549,20 +561,26 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
                                           ],
                                         ),
                                       ),
-                                      Column(
-                                        children: [
-                                          ClipOval(
-                                            child: SizedBox(
-                                              width: 80,
-                                              height: 80,
-                                              child: Image.network(
-                                                "https://d3apkeya39jz4k.cloudfront.net/Pn_M_56aa8e7af2_4b05aeef37.webp",
-                                                fit: BoxFit.cover,
+                                      InkWell(
+                                        onTap: () {
+                                          Navigator.pushNamed(
+                                              context, CabHomeRoute);
+                                        },
+                                        child: Column(
+                                          children: [
+                                            ClipOval(
+                                              child: SizedBox(
+                                                width: 80,
+                                                height: 80,
+                                                child: Image.network(
+                                                  "https://d3apkeya39jz4k.cloudfront.net/Pn_M_56aa8e7af2_4b05aeef37.webp",
+                                                  fit: BoxFit.cover,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          SubTitleText(subTitle: 'Ride Now'),
-                                        ],
+                                            SubTitleText(subTitle: 'Ride Now'),
+                                          ],
+                                        ),
                                       ),
                                       Column(
                                         children: [

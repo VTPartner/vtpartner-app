@@ -150,18 +150,19 @@ AppInfo? appInfo;
 
   onCameraMove(CameraPosition? position) {
     if (position != null) {
-      final latitude = position.target.latitude;
-      final longitude = position.target.longitude;
+      _latitude = position.target.latitude;
+      _longitude = position.target.longitude;
 
       // Cancel any ongoing debounce calls
       if (_debounce?.isActive ?? false) _debounce?.cancel();
 
       // Set up a new debounce call
       _debounce = Timer(Duration(seconds: 1), () {
-        getAddressFromLatLng(latitude, longitude);
+        getAddressFromLatLng(_latitude, _longitude);
         setState(() {
           _showBottomSheet =
               true; // Show the bottom sheet when position is updated
+          isLoading = false;
         });
       });
 
@@ -169,6 +170,7 @@ AppInfo? appInfo;
       if (_showBottomSheet) {
         setState(() {
           _showBottomSheet = false;
+          isLoading = true;
         });
       }
     }
@@ -179,6 +181,10 @@ AppInfo? appInfo;
     _debounce?.cancel();
     super.dispose();
   }
+
+  double _latitude = 0.0;
+  double _longitude = 0.0;
+
 
   @override
   Widget build(BuildContext context) {
@@ -205,7 +211,7 @@ AppInfo? appInfo;
                     if (_locationInitialized)
                       Positioned(
                         left: MediaQuery.of(context).size.width / 2 -
-                            22.5, // Center horizontally
+                            28.5, // Center horizontally
                         top: MediaQuery.of(context).size.height / 2 -
                             22.5, // Center vertically
                         child: Image.asset(
@@ -215,6 +221,13 @@ AppInfo? appInfo;
                           height: 45,
                         ),
                       ),
+                    Positioned(
+                        left: 0,
+                        right: 0,
+                        top: MediaQuery.of(context).size.height / 2 -
+                            65, // Adjust for tooltip position
+                        child: CustomTooltip(
+                            message: 'This is your Pickup Location')),
                     SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
@@ -405,54 +418,15 @@ AppInfo? appInfo;
                             color: Colors.transparent,
                             child: InkWell(
                               onTap: () async {
-                                String placeDirectionDetailsUrl =
-                                    "https://maps.googleapis.com/maps/api/place/details/json?place_id=${Provider.of<AppInfo>(context, listen: false).userPickupLocation!.locationId!}&key=$mapKey";
-
-                                var responseApi =
-                                    await RequestAssistant.receiveRequest(
-                                        placeDirectionDetailsUrl);
-
-                                if (responseApi == "Error") {
-                                  print("Something Went Wrong");
-
-                                  return;
-                                }
-//https://developers.google.com/maps/documentation/places/web-service/details#json
-                                if (responseApi["status"] == "OK") {
-                                  Directions directions = Directions();
-                                  directions.locationId = placeId;
-                                  directions.locationName =
-                                      // responseApi["result"]["name"];
-                                      directions.locationName =
-                                          responseApi["result"]
-                                              ["formatted_address"];
-                                  print(
-                                      "Selected Pickup Location Name::${directions.locationName!.toString()}");
-                                  directions.locationLatitude =
-                                      responseApi["result"]["geometry"]
-                                          ["location"]["lat"];
-                                  directions.locationLongitude =
-                                      responseApi["result"]["geometry"]
-                                          ["location"]["lng"];
-
-                                  Provider.of<AppInfo>(context, listen: false)
-                                      .updatePickupLocationAddress(directions);
+                                if (_latitude != 0.0 || _longitude != 0.0) {
+                                  await getAddressFromLatLng(
+                                      _latitude, _longitude);
+                                  Navigator.pop(context);
+                                  Navigator.pop(context);
                                 } else {
-                                  if (kDebugMode) {
-                                    print("PLace Id details not found");
-                                  }
-
-                                  return;
+                                  print("LatLng Error");
                                 }
-                                // setState(() {
-                                //   _controller.text =
-                                //       _placesPredictedList[index].description!;
-                                //   _placesPredictedList = [];
-                                //   hideSuggestion = false;
-                                //   FocusScope.of(context).unfocus();
-                                // });
-                                Navigator.pop(context);
-                                Navigator.pop(context);
+                                
                               },
                               child: Ink(
                                 decoration: BoxDecoration(
@@ -493,9 +467,66 @@ AppInfo? appInfo;
                               ),
                             ),
                           ),
+                  
                   ],
                 ),
               )
             : null);
+  }
+}
+
+
+class CustomTooltip extends StatelessWidget {
+  final String message;
+
+  CustomTooltip({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Tooltip Container
+        Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+              color: Colors.black, borderRadius: BorderRadius.circular(8.0)),
+          child: Text(
+            message,
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
+        ),
+        // Pointer Shape
+        Positioned(
+          top: 32, // Adjust position for the pointer
+          child: CustomPaint(
+            size: Size(20, 10), // Size of the triangle
+            painter: TrianglePainter(),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TrianglePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..color = Colors.white;
+    var path = Path();
+
+    path.moveTo(size.width / 2, 0); // Top point of the triangle
+    path.lineTo(0, size.height); // Bottom left point
+    path.lineTo(size.width, size.height); // Bottom right point
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return false;
   }
 }

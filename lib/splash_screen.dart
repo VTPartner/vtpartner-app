@@ -41,8 +41,11 @@ class _MySplashScreenState extends State<MySplashScreen> {
       String humanReadableAddress =
           await AssistantMethods.searchAddressForGeographicCoOrdinates(
               position!, context);
-      print("MyLocation::" + humanReadableAddress);
       
+      print("MyLocation::" + humanReadableAddress);
+      if (humanReadableAddress.isEmpty) {
+        _getUserLocationAndAddress();
+      }
     } catch (e) {
       
       print("Error: ${e.toString()}");

@@ -24,5 +24,24 @@ const String BookingSuccessScreenRoute = "booking_success";
 
 
 //Agent Routes
-const String AgentHomeScreenRoute = "agent_home";
+const String AgentLoginRoute = "agent_login";
+const String AgentOTPRoute = "agent_otp";
+const String AgentDocumentVerificationRoute = "agent_document_verification";
+const String AgentVehicleDocumentVerificationRoute =
+    "agent_vehicle_document_verification";
 const String AgentSettingsRoute = "agent_settings";
+const String AgentHomeScreenRoute = "agent_home";
+
+//Cab Customer Page
+const String CabHomeRoute = "cab_customer_home";
+const String CabPickupLocationSearchRoute =
+    "cab_customer_pickup_location_search";
+const String CabLocateOnMapPickupLocationRoute =
+    "cab_customer_locate_on_map_pickup";
+const String CabDestinationLocationSearchRoute =
+    "cab_customer_destination_location_search";
+const String CabLocateOnMapDestinationLocationRoute =
+    "cab_customer_locate_on_map_destination";
+const String CabLocationsConfirmRoute = "cab_locations_confirm";
+const String CabSearchingForCabRoute = "cab_customer_searching_cab_for_booking";
+const String CabBookingConfirmedRoute = "cab_customer_booking_confirmed";

@@ -275,7 +275,7 @@ class _SettingsScreenTabPageState extends State<SettingsScreenTabPage> {
                             title: 'Register as a Partner',
                             onTap: () {
                               Navigator.pushNamed(
-                                  context, AgentHomeScreenRoute);
+                                  context, AgentLoginRoute);
                             }),
                         SizedBox(
                           height: kHeight,

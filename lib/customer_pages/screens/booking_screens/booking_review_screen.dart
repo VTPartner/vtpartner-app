@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
@@ -17,7 +18,9 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
 
   ScrollController _scrollController = ScrollController();
   GlobalKey _fareDetailsKey = GlobalKey();
+  GlobalKey _rulesDetailsKey = GlobalKey();
   bool _isHighlighted = false;
+  bool _isHighlightedRules = false;
 
   @override
   void dispose() {
@@ -46,6 +49,30 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
     Future.delayed(Duration(seconds: 1), () {
       setState(() {
         _isHighlighted = false;
+      });
+    });
+  }
+
+  void _scrollAndHighlightRulesDetails() {
+    final RenderBox renderBox =
+        _rulesDetailsKey.currentContext?.findRenderObject() as RenderBox;
+    final position = renderBox.localToGlobal(Offset.zero).dy;
+
+    _scrollController.animateTo(
+      position + _scrollController.offset,
+      duration: Duration(milliseconds: 600),
+      curve: Curves.ease,
+    );
+
+    // Highlight the container temporarily
+    setState(() {
+      _isHighlightedRules = true;
+    });
+
+    // Remove the highlight after a short duration
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        _isHighlightedRules = false;
       });
     });
   }
@@ -195,8 +222,13 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.all(8.0),
-                                    child: Icon(
-                                      Icons.info_outline_rounded,
+                                    child: InkWell(
+                                      onTap: () {
+                                        _scrollAndHighlightRulesDetails();
+                                      },
+                                      child: Icon(
+                                        Icons.info_outline_rounded,
+                                      ),
                                     ),
                                   )
                                 ],
@@ -508,10 +540,23 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Container(
+                  key: _rulesDetailsKey,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.white, // Keep the background color white
+                    boxShadow: _isHighlightedRules
+                        ? [
+                            BoxShadow(
+                              color: ThemeClass.facebookBlue
+                                  .withOpacity(0.7), // Shadow color
+                              spreadRadius: 2, // Increase size
+                              blurRadius: 5, // Softness of the shadow
+                              offset: Offset(0, 2), // Position of the shadow
+                            ),
+                          ]
+                        : [], // No shadow when not highlighted
                     borderRadius: BorderRadius.circular(12.0),
                   ),
+                  
                   height: height / 4,
                   child: ListView.builder(
                       itemCount: 5,
@@ -712,10 +757,19 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
                 onDragEnd: () {
                   Navigator.pushNamed(context, BookingSearchDriverRoute);
                 },
+                
               )
             ],
           ),
         ));
   
+  }
+
+  double _dragPosition = 0.0;
+
+  void _resetDragPosition() {
+    setState(() {
+      _dragPosition = 0.0; // Reset the drag position
+    });
   }
 }

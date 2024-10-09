@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 
 class SwipeToBookButton extends StatefulWidget {
   final String title;
   final Function onDragEnd;
-  const SwipeToBookButton(
-      {super.key, required this.title, required this.onDragEnd});
+  
+  const SwipeToBookButton({
+    super.key,
+    required this.title,
+    required this.onDragEnd,
+  });
 
   @override
   _SwipeToBookButtonState createState() => _SwipeToBookButtonState();
@@ -23,6 +28,10 @@ class _SwipeToBookButtonState extends State<SwipeToBookButton>
   void initState() {
     super.initState();
     // Initialize the AnimationController
+    setState(() {
+      _dragPosition = 0.0;
+      _isBookingConfirmed = false;
+    });
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2), // Control wave speed here
@@ -63,12 +72,17 @@ class _SwipeToBookButtonState extends State<SwipeToBookButton>
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  _isBookingConfirmed ? 'Booking Confirmed!' : widget.title,
-                  style: nunitoSansStyle.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                child: Shimmer.fromColors(
+                  baseColor: Colors.white,
+                  highlightColor: Colors.grey.withOpacity(0.1),
+                  child: Text(
+                    _isBookingConfirmed ? 'Booking Confirmed!' : widget.title,
+                    style: nunitoSansStyle.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize:
+                          Theme.of(context).textTheme.bodyMedium?.fontSize,
+                    ),
                   ),
                 ),
               ),
@@ -99,8 +113,11 @@ class _SwipeToBookButtonState extends State<SwipeToBookButton>
                     });
                   } else {
                     // Navigate or show booking confirmation
-                    // Navigator.pushNamed(context, '/bookingConfirmation');
                     widget.onDragEnd();
+                    setState(() {
+                      _dragPosition = 0;
+                      _isBookingConfirmed = false;
+                    });
                   }
                 },
                 child: AnimatedContainer(
@@ -112,9 +129,13 @@ class _SwipeToBookButtonState extends State<SwipeToBookButton>
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      color: ThemeClass.facebookBlue,
+                    child: Shimmer.fromColors(
+                      baseColor: ThemeClass.facebookBlue,
+                      highlightColor: Colors.grey.withOpacity(0.1),
+                      child: Icon(
+                        Icons.arrow_forward_ios,
+                        color: ThemeClass.facebookBlue,
+                      ),
                     ),
                   ),
                 ),

@@ -7,19 +7,19 @@ import 'package:vt_partner/widgets/google_textform.dart';
 import 'package:vt_partner/widgets/heading_text.dart';
 import 'package:vt_partner/widgets/sub_title_text.dart';
 
-class AgentDocumentVerificationScreen extends StatefulWidget {
-  const AgentDocumentVerificationScreen({super.key});
+class AgentVehicleDocumentVerification extends StatefulWidget {
+  const AgentVehicleDocumentVerification({super.key});
 
   @override
-  State<AgentDocumentVerificationScreen> createState() =>
-      _AgentDocumentVerificationScreenState();
+  State<AgentVehicleDocumentVerification> createState() =>
+      _AgentVehicleDocumentVerificationState();
 }
 
-class _AgentDocumentVerificationScreenState
-    extends State<AgentDocumentVerificationScreen> {
-  
+class _AgentVehicleDocumentVerificationState
+    extends State<AgentVehicleDocumentVerification> {
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -42,7 +42,7 @@ class _AgentDocumentVerificationScreenState
                 height: kHeight,
               ),
               Text(
-                "Owner Information",
+                "Owner Vehicle Information",
                 style: nunitoSansStyle.copyWith(
                     fontWeight: FontWeight.bold,
                     color: ThemeClass.backgroundColorDark,
@@ -61,10 +61,10 @@ class _AgentDocumentVerificationScreenState
                 height: kHeight + 10,
               ),
               GoogleTextFormField(
-                  hintText: 'Enter your as per document',
+                  hintText: 'Enter your vehicle number',
                   textInputType: TextInputType.text,
                   textCapitalization: TextCapitalization.words,
-                  labelText: 'Owner Name *'),
+                  labelText: 'Vehicle Number *'),
               SizedBox(
                 height: kHeight,
               ),
@@ -88,26 +88,40 @@ class _AgentDocumentVerificationScreenState
                 height: kHeight,
               ),
               documentStyle(
-                  () {}, Icons.fire_truck_outlined, 'Driving License'),
+                  () {},
+                  Icons.verified,
+                  'Registration Certificate (RC)',
+                  'Proof of vehicle ownership and registration',
+                  width),
               Divider(
                 color: Colors.grey,
                 thickness: 0.3,
                 indent: 30,
               ),
-              documentStyle(() {}, Icons.person_3, 'Aadhar Card [ Owner ]'),
+              documentStyle(() {}, Icons.verified_user, 'Insurance Certificate',
+                  'Valid insurance for the vehicle', width),
               Divider(
                 color: Colors.grey,
                 thickness: 0.3,
                 indent: 30,
               ),
               documentStyle(
-                  () {}, Icons.tab_unselected_sharp, 'PAN Card [ Owner ]'),
+                  () {},
+                  Icons.car_crash,
+                  'Fitness Certificate',
+                  'For commercial vehicles, confirming that the vehicle is fit for operation.',
+                  width),
               Divider(
                 color: Colors.grey,
                 thickness: 0.3,
                 indent: 30,
               ),
-              documentStyle(() {}, Icons.camera, 'Owner Selfie'),
+              documentStyle(
+                  () {},
+                  Icons.air_rounded,
+                  'Pollution Under Control (PUC) Certificate',
+                  'Proof that the vehicle meets emission standards.',
+                  width),
               Divider(
                 color: Colors.grey,
                 thickness: 0.3,
@@ -130,8 +144,7 @@ class _AgentDocumentVerificationScreenState
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
-                  Navigator.pushNamed(
-                      context, AgentVehicleDocumentVerificationRoute);
+                  Navigator.pushNamed(context, AgentHomeScreenRoute);
                 },
                 child: Ink(
                   decoration: BoxDecoration(
@@ -146,7 +159,7 @@ class _AgentDocumentVerificationScreenState
                           Padding(
                             padding: const EdgeInsets.all(16.0),
                             child: Text(
-                              'Continue',
+                              'Submit',
                               style: nunitoSansStyle.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,
@@ -170,7 +183,8 @@ class _AgentDocumentVerificationScreenState
     );
   }
 
-  Material documentStyle(Function onTap, IconData iconData, String title) {
+  Material documentStyle(Function onTap, IconData iconData, String title,
+      String desc, double width) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -190,13 +204,27 @@ class _AgentDocumentVerificationScreenState
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 12.0),
-                    child: Text(
-                      title,
-                      style: nunitoSansStyle.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: 14.0),
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: nunitoSansStyle.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: 14.0),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(
+                          width: width - 100,
+                          child: Text(
+                            desc,
+                            style: nunitoSansStyle.copyWith(
+                                color: Colors.grey, fontSize: 10.0),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   )
                 ],
@@ -216,4 +244,3 @@ class _AgentDocumentVerificationScreenState
     );
   }
 }
-
