@@ -10,6 +10,8 @@ import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
+import 'package:vt_partner/global/global.dart' as glb;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MySplashScreen extends StatefulWidget {
   const MySplashScreen({super.key});
@@ -28,10 +30,32 @@ class _MySplashScreenState extends State<MySplashScreen> {
   }
 
   void _delaySplash() async {
-    // final prefs = await SharedPreferences.getInstance();
-    Navigator.pushReplacementNamed(context, OnBoardingRoute);
-    // Navigator.pushReplacementNamed(context, CustomerMainScreenRoute);
+    try {
+      final pref = await SharedPreferences.getInstance();
+      var first_run = pref?.getString('first_run');
+      var customer_id = pref?.getString('customer_id');
+      // pref.setString("customer_id", "");
+      // pref.setString("customer_name", "");
+      var customer_name = pref?.getString('customer_name');
+      if (customer_id != null &&
+          customer_id.isNotEmpty &&
+          customer_name != null &&
+          customer_name.isNotEmpty &&
+          customer_name != "NA") {
+        Navigator.pushReplacementNamed(context, CustomerMainScreenRoute);
+      } else if (customer_id != null &&
+          customer_id.isNotEmpty &&
+          customer_name != null &&
+          customer_name.isNotEmpty) {
+        Navigator.pushReplacementNamed(context, NewCustomerDetailsRoute);
+      } else {
+        Navigator.pushReplacementNamed(context, OnBoardingRoute);
+      }
+    } catch (e) {
+      print("Error initializing SharedPreferences: $e");
+    }
   }
+
 
     
 
@@ -69,6 +93,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
   @override
   void initState() {
     super.initState();
+    glb.initializeEndpoints();
     _getUserLocationAndAddress();
     _animateContainer();
 

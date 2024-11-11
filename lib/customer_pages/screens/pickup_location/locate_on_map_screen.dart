@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -201,8 +202,8 @@ AppInfo? appInfo;
                     GoogleMap(
                       initialCameraPosition: _currentPosition,
                       mapType: MapType.normal,
-                      myLocationButtonEnabled: true,
-                      myLocationEnabled: true,
+                      myLocationButtonEnabled: false,
+                      myLocationEnabled: false,
                       onCameraMove: onCameraMove,
                       onMapCreated: (GoogleMapController controller) {
                         _controller.complete(controller);
@@ -211,23 +212,25 @@ AppInfo? appInfo;
                     if (_locationInitialized)
                       Positioned(
                         left: MediaQuery.of(context).size.width / 2 -
-                            28.5, // Center horizontally
+                            20, // Center horizontally
                         top: MediaQuery.of(context).size.height / 2 -
                             22.5, // Center vertically
-                        child: Image.asset(
-                          "assets/icons/round_pin.gif",
-                          color: Colors.green[600],
+                        child: SvgPicture.asset(
+                          "assets/svg/blue_pin.svg",
+                          // color: Colors.green[600],
                           width: 45,
                           height: 45,
                         ),
                       ),
-                    Positioned(
+                    _showBottomSheet
+                        ? Positioned(
                         left: 0,
                         right: 0,
                         top: MediaQuery.of(context).size.height / 2 -
                             65, // Adjust for tooltip position
                         child: CustomTooltip(
-                            message: 'This is your Pickup Location')),
+                                message: 'This is your Pickup Location'))
+                        : SizedBox(),
                     SafeArea(
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
@@ -488,22 +491,26 @@ class CustomTooltip extends StatelessWidget {
       children: [
         // Tooltip Container
         Container(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.all(26),
           decoration: BoxDecoration(
-              color: Colors.black, borderRadius: BorderRadius.circular(8.0)),
+              // color: Colors.black,
+              borderRadius: BorderRadius.circular(8.0)),
           child: Text(
             message,
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black, fontSize: 10.0
             ),
           ),
         ),
         // Pointer Shape
-        Positioned(
-          top: 32, // Adjust position for the pointer
-          child: CustomPaint(
-            size: Size(20, 10), // Size of the triangle
-            painter: TrianglePainter(),
+        Visibility(
+          visible: false,
+          child: Positioned(
+            top: 32, // Adjust position for the pointer
+            child: CustomPaint(
+              size: Size(20, 10), // Size of the triangle
+              painter: TrianglePainter(),
+            ),
           ),
         ),
       ],

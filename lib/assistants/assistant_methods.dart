@@ -12,17 +12,24 @@ import 'package:vt_partner/models/pickup_location_map_direction.dart';
 class AssistantMethods {
   static Future<String> searchAddressForGeographicCoOrdinates(
       Position position, context) async {
-    String humanReadableAddress = "";
+    String humanReadableAddress = "", postalCode = "";
     String apiUrl =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$mapKey";
 
     var response = await RequestAssistant.receiveRequest(apiUrl);
     if (response != "Error") {
       humanReadableAddress = response["results"][0]["formatted_address"];
-
+      for (var component in response["results"][0]["address_components"]) {
+        if (component["types"].contains("postal_code")) {
+          postalCode = component["long_name"];
+          break;
+        }
+      }
+      print("postalCode::$postalCode");
       Directions userPickUpAddress = Directions();
       userPickUpAddress.locationLatitude = position.latitude;
       userPickUpAddress.locationLongitude = position.longitude;
+      userPickUpAddress.pinCode = postalCode;
       userPickUpAddress.locationName = humanReadableAddress;
 
       Provider.of<AppInfo>(context, listen: false)
@@ -35,7 +42,7 @@ class AssistantMethods {
 
   static Future<String> mapLocationUsingFromLatLng(
       double lat, double lng, context) async {
-    String humanReadableAddress = "", placeId = "";
+    String humanReadableAddress = "", placeId = "", postalCode = "";
     String apiUrl =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapKey";
 
@@ -43,12 +50,20 @@ class AssistantMethods {
 
     if (response != "Error") {
       humanReadableAddress = response["results"][0]["formatted_address"];
+      for (var component in response["results"][0]["address_components"]) {
+        if (component["types"].contains("postal_code")) {
+          postalCode = component["long_name"];
+          break;
+        }
+      }
+      print("postalCode::$postalCode");
       placeId = response["results"][0]["place_id"];
       // print("Map Location Result ::$placeId");
       Directions userPickUpAddress = Directions();
       userPickUpAddress.locationLatitude = lat;
       userPickUpAddress.locationLongitude = lng;
       userPickUpAddress.locationId = placeId;
+      userPickUpAddress.pinCode = postalCode;
       userPickUpAddress.locationName = humanReadableAddress;
 
       Provider.of<AppInfo>(context, listen: false)
@@ -59,7 +74,7 @@ class AssistantMethods {
 
   static Future<String> mapDropLocationUsingFromLatLng(
       double lat, double lng, context) async {
-    String humanReadableAddress = "", placeId = "";
+    String humanReadableAddress = "", placeId = "", postalCode = "";
     String apiUrl =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=$mapKey";
 
@@ -67,11 +82,18 @@ class AssistantMethods {
 
     if (response != "Error") {
       humanReadableAddress = response["results"][0]["formatted_address"];
+      for (var component in response["results"][0]["address_components"]) {
+        if (component["types"].contains("postal_code")) {
+          postalCode = component["long_name"];
+          break;
+        }
+      }
       placeId = response["results"][0]["place_id"];
       Directions userPickUpAddress = Directions();
       userPickUpAddress.locationLatitude = lat;
       userPickUpAddress.locationLongitude = lng;
       userPickUpAddress.locationId = placeId;
+      userPickUpAddress.pinCode = postalCode;
       userPickUpAddress.locationName = humanReadableAddress;
 
       Provider.of<AppInfo>(context, listen: false)

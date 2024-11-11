@@ -264,19 +264,19 @@ class _SettingsScreenTabPageState extends State<SettingsScreenTabPage> {
                             icon: Icons.article_outlined,
                             title: 'Terms and Conditions',
                             onTap: () {}),
-                        Divider(
-                          color: Colors.grey,
-                          thickness: 0.1,
-                          indent: 70,
-                          endIndent: 20,
-                        ),
-                        SettingsMenuItems(
-                            icon: Icons.fire_truck_outlined,
-                            title: 'Register as a Partner',
-                            onTap: () {
-                              Navigator.pushNamed(
-                                  context, AgentLoginRoute);
-                            }),
+                        // Divider(
+                        //   color: Colors.grey,
+                        //   thickness: 0.1,
+                        //   indent: 70,
+                        //   endIndent: 20,
+                        // ),
+                        // SettingsMenuItems(
+                        //     icon: Icons.fire_truck_outlined,
+                        //     title: 'Register as a Goo',
+                        //     onTap: () {
+                        //       Navigator.pushNamed(
+                        //           context, AgentLoginRoute);
+                        //     }),
                         SizedBox(
                           height: kHeight,
                         )

@@ -2,12 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>This app needs access to location when open.</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background.</string>
-	<key>NSContactsUsageDescription</key>  
-	<string>For optimal functionality and to enhance your delivery experience, this app requires access to your contacts.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -32,6 +26,18 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSContactsUsageDescription</key>
+	<string>For optimal functionality and to enhance your delivery experience, this app requires access to your contacts.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need permission to access your files to upload it for verification.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Need permission to access your camera for you to capture the document and upload it for verification.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Need permission to access mic if in case we need video upload</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app needs access to location when in the background.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app needs access to location when open.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

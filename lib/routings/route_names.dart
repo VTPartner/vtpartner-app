@@ -27,10 +27,24 @@ const String BookingSuccessScreenRoute = "booking_success";
 const String AgentLoginRoute = "agent_login";
 const String AgentOTPRoute = "agent_otp";
 const String AgentDocumentVerificationRoute = "agent_document_verification";
+const String AgentOwnerDetailsRoute = "agent_owner_verification";
 const String AgentVehicleDocumentVerificationRoute =
     "agent_vehicle_document_verification";
 const String AgentSettingsRoute = "agent_settings";
 const String AgentHomeScreenRoute = "agent_home";
+const String AadharCardUploadRoute = "aadhar_card";
+const String PanCardUploadRoute = "pan_card";
+const String DrivingLicenseUploadRoute = "driving_license_card";
+const String OwnerSelfieUploadRoute = "owner_selfie";
+//Vehicle Documents
+const String VehicleImagesUploadRoute = "vehicle_images";
+const String VehiclePlateImagesUploadRoute = "vehicle_plate_images";
+const String RCUploadRoute = "rc_image";
+const String InsuranceUploadRoute = "insurance_image";
+const String NOCUploadRoute = "noc_image";
+const String PUCUploadRoute = "puc_image";
+//Owner Document
+const String OwnerPhotoUploadRoute = "owner_photo";
 
 //Cab Customer Page
 const String CabHomeRoute = "cab_customer_home";

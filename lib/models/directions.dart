@@ -4,6 +4,7 @@ class Directions {
   String? locationId;
   double? locationLatitude;
   double? locationLongitude;
+  String? pinCode;
 
   Directions({
     this.humanReadableAddress,
@@ -11,5 +12,6 @@ class Directions {
     this.locationId,
     this.locationLatitude,
     this.locationLongitude,
+    this.pinCode,
   });
 }

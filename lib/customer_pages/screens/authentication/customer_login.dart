@@ -1,8 +1,15 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart' as http;
+import 'package:vt_partner/assistants/request_assistance.dart';
 
 import '../../../routings/route_names.dart';
 import '../../../themes/themes.dart';
 import '../../../utils/app_styles.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
 class CountryCode {
   final String code;
@@ -34,7 +41,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
   final TextEditingController _mobileController = TextEditingController();
   final List<CountryCode> _countryCodes = [
     CountryCode(code: '+91', flag: '🇮🇳'), // India
-    CountryCode(code: '+971', flag: '🇸🇩'), // UAE
+    // CountryCode(code: '+971', flag: '🇸🇩'), // UAE
   ];
   bool _isButtonVisible = false;
   bool _isErrorVisible = false;
@@ -49,6 +56,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
     }
     return null;
   }
+
 
   @override
   void initState() {
@@ -68,6 +76,13 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
         FocusScope.of(context).unfocus();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    FocusScope.of(context).unfocus();
+    super.dispose();
   }
 
   @override
@@ -207,12 +222,29 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
                   color: Colors.grey[800], fontSize: 11.5),
               overflow: TextOverflow.visible,
             ),
-            SizedBox(height: 15.0,),
+            SizedBox(
+              height: 15.0,
+            ),
             Material(
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
+                  FocusScope.of(context).unfocus();
+                  var mobile_no = _mobileController.text.toString().trim();
+                  if (mobile_no.isEmpty) {
+                    Fluttertoast.showToast(
+                      msg: "Please enter your mobile number",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
+                  } else if (mobile_no.length < 10 || mobile_no.length > 10) {
+                    Fluttertoast.showToast(
+                      msg: "Please enter valid 10 digits mobile number",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
+                  } else {
+                    glb.customer_mobile_no = mobile_no;
                   Navigator.pushNamed(context, CustomerOTPVerificationRoute);
+                  }
                 },
                 child: Ink(
                   decoration: BoxDecoration(
@@ -245,7 +277,6 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
                 ),
               ),
             ),
-          
           ],
         ),
       ),

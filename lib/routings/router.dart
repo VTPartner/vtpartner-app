@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:vt_partner/customer_pages/screens/authentication/customer_login.dart';
 import 'package:vt_partner/customer_pages/screens/authentication/customer_otp_verification_screen.dart';
 import 'package:vt_partner/customer_pages/screens/authentication/new_customer_details_screen.dart';
-import 'package:vt_partner/customer_pages/screens/booking_screens/add_stops_screen.dart';
 import 'package:vt_partner/customer_pages/screens/booking_screens/booking_locations_screen.dart';
 import 'package:vt_partner/customer_pages/screens/booking_screens/booking_review_screen.dart';
 import 'package:vt_partner/customer_pages/screens/booking_screens/booking_searching_driver_screen.dart';
@@ -31,8 +30,21 @@ import 'package:vt_partner/customer_pages/screens/pickup_location/pickup_locatio
 import 'package:vt_partner/customer_pages/screens/ride_details/completed_ride_details_screen.dart';
 import 'package:vt_partner/delivery_agent_pages/screens/authentication/agent_document_verification_screen.dart';
 import 'package:vt_partner/delivery_agent_pages/screens/authentication/agent_login_screen.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/agent_owner_details_screen.dart';
 import 'package:vt_partner/delivery_agent_pages/screens/authentication/agent_vehicle_verification.dart';
 import 'package:vt_partner/delivery_agent_pages/screens/authentication/agents_otp_verification.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/documents/aadhar_card_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/documents/driving_license_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/documents/owner_selfie_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/documents/pan_card_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/owner_documents/owner_photo_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/vehicle_documents/vehicle_image_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/vehicle_documents/vehicle_insurance_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/vehicle_documents/vehicle_noc_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/vehicle_documents/vehicle_plate_no_upload.dart';
+
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/vehicle_documents/vehicle_puc_upload.dart';
+import 'package:vt_partner/delivery_agent_pages/screens/authentication/vehicle_documents/vehicle_rc_upload.dart';
 import 'package:vt_partner/delivery_agent_pages/screens/home/agent_home_screen.dart';
 import 'package:vt_partner/delivery_agent_pages/screens/settings/agent_settings_screen.dart';
 
@@ -54,6 +66,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case CustomerOTPVerificationRoute:
       return _getPageRoute(const CustomerOTPVerificationScreen());
     case CustomerMainScreenRoute:
+      // return _getPageRoute(const HomeScreenTabPage());
       return _getPageRoute(const CustomerMainScreen());
     case CustomerOngoingRideDetailsRoute:
       return _getPageRoute(const CustomerOngoingRideDetailsScreen());
@@ -104,12 +117,38 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(const AgentDocumentVerificationScreen());
     case AgentVehicleDocumentVerificationRoute:
       return _getPageRoute(const AgentVehicleDocumentVerification());
+    case AgentOwnerDetailsRoute:
+      return _getPageRoute(const VehicleOwnerDetailsScreen());
     case AgentHomeScreenRoute:
       return _getPageRoute(const AgentHomeScreen());
     case AgentHomeScreenRoute:
       return _getPageRoute(const AgentHomeScreen());
     case AgentSettingsRoute:
       return _getPageRoute(const AgentSettingsScreen());
+    case AadharCardUploadRoute:
+      return _getPageRoute(AadharCardUploadScreen());
+    case PanCardUploadRoute:
+      return _getPageRoute(PanCardUploadScreen());
+    case DrivingLicenseUploadRoute:
+      return _getPageRoute(DrivingLicenseUploadScreen());
+    case OwnerSelfieUploadRoute:
+      return _getPageRoute(OwnerSelfieUpload());
+    //Vehicle Documents upload
+    case VehicleImagesUploadRoute:
+      return _getPageRoute(VehicleImageUpload());
+    case VehiclePlateImagesUploadRoute:
+      return _getPageRoute(VehiclePlateNoUpload());
+    case RCUploadRoute:
+      return _getPageRoute(VehicleRCUpload());
+    case InsuranceUploadRoute:
+      return _getPageRoute(VehicleInsuranceUpload());
+    case NOCUploadRoute:
+      return _getPageRoute(VehicleNOCUpload());
+    case PUCUploadRoute:
+      return _getPageRoute(VehiclePUCUpload());
+    case OwnerPhotoUploadRoute:
+      return _getPageRoute(OwnerPhotoUpload());
+
 
 
 //Cab Customer Pages

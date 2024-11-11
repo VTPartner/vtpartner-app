@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:vt_partner/customer_pages/screens/authentication/customer_login.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
 class AgentLoginScreen extends StatefulWidget {
   const AgentLoginScreen({super.key});
@@ -17,7 +19,7 @@ class _AgentLoginScreenState extends State<AgentLoginScreen> {
   final TextEditingController _mobileController = TextEditingController();
   final List<CountryCode> _countryCodes = [
     CountryCode(code: '+91', flag: '🇮🇳'), // India
-    CountryCode(code: '+971', flag: '🇸🇩'), // UAE
+    // CountryCode(code: '+971', flag: '🇸🇩'), // UAE
   ];
   bool _isButtonVisible = false;
   bool _isErrorVisible = false;
@@ -52,6 +54,8 @@ class _AgentLoginScreenState extends State<AgentLoginScreen> {
       }
     });
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +201,23 @@ class _AgentLoginScreenState extends State<AgentLoginScreen> {
               color: Colors.transparent,
               child: InkWell(
                 onTap: () {
+                  FocusScope.of(context).unfocus();
+                  var mobile_no = _mobileController.text.toString().trim();
+                  if (mobile_no.isEmpty) {
+                    Fluttertoast.showToast(
+                      msg: "Please enter your mobile number",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
+                  } else if (mobile_no.length < 10 || mobile_no.length > 10) {
+                    Fluttertoast.showToast(
+                      msg: "Please enter valid 10 digits mobile number",
+                      toastLength: Toast.LENGTH_SHORT,
+                    );
+                  } else {
+                    glb.delivery_agent_mobile_no = mobile_no;
                   Navigator.pushNamed(context, AgentOTPRoute);
+                  }
+                  //Navigator.pushNamed(context, AgentOTPRoute);
                 },
                 child: Ink(
                   decoration: BoxDecoration(
