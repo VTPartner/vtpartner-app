@@ -184,7 +184,7 @@ class _VehicleOwnerDetailsScreenState extends State<VehicleOwnerDetailsScreen> {
       setState(() {
         isLoading = false;
       });
-      glb.showToast("An error occurred: ${e.toString()}");
+      //glb.showToast("An error occurred: ${e.toString()}");
     }
   }
 

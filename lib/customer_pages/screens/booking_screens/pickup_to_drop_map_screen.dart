@@ -187,8 +187,12 @@ class _PickToDropPolyLineMapScreenState
                                       ),
                                     ),
                                     DescriptionText(
-                                        descriptionText:
-                                            "Shaheed . 8296565587"),
+                                        descriptionText: Provider.of<AppInfo>(
+                                                        context)
+                                                    .senderContactDetail !=
+                                                null
+                                            ? "${Provider.of<AppInfo>(context).senderContactDetail!.contactName!} . ${Provider.of<AppInfo>(context).senderContactDetail!.contactNumber!}"
+                                            : "Error ..."),
                                     SizedBox(
                                       width: width - 80,
                                       child: BodyText1(
@@ -231,7 +235,12 @@ class _PickToDropPolyLineMapScreenState
                                       ),
                                     ),
                                     DescriptionText(
-                                        descriptionText: "Ravi . 789867545"),
+                                        descriptionText: Provider.of<AppInfo>(
+                                                        context)
+                                                    .receiverContactDetail !=
+                                                null
+                                            ? "${Provider.of<AppInfo>(context).receiverContactDetail!.contactName!} . ${Provider.of<AppInfo>(context).receiverContactDetail!.contactNumber!}"
+                                            : "Error ..."),
                                     SizedBox(
                                       width: width - 80,
                                       child: BodyText1(
@@ -253,29 +262,33 @@ class _PickToDropPolyLineMapScreenState
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                InkWell(
-                                  onTap: () {
-                                    Navigator.pushNamed(context, AddStopsRoute);
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 12.0),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.add_circle_outline,
-                                          size: 18,
-                                        ),
-                                        SizedBox(
-                                          width: 5.0,
-                                        ),
-                                        DescriptionText(
-                                            descriptionText: 'ADD STOPS')
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                // Visibility(
+                                //   visible: false,
+                                //   child: InkWell(
+                                //     onTap: () {
+                                //       Navigator.pushNamed(
+                                //           context, AddStopsRoute);
+                                //     },
+                                //     child: Padding(
+                                //       padding: const EdgeInsets.only(top: 12.0),
+                                //       child: Row(
+                                //         mainAxisAlignment:
+                                //             MainAxisAlignment.center,
+                                //         children: [
+                                //           Icon(
+                                //             Icons.add_circle_outline,
+                                //             size: 18,
+                                //           ),
+                                //           SizedBox(
+                                //             width: 5.0,
+                                //           ),
+                                //           DescriptionText(
+                                //               descriptionText: 'ADD STOPS')
+                                //         ],
+                                //       ),
+                                //     ),
+                                //   ),
+                                // ),
                                 InkWell(
                                   onTap: () {
                                     Navigator.pop(context);
@@ -326,7 +339,7 @@ class _PickToDropPolyLineMapScreenState
                               initialCameraPosition: _kGooglePlex,
                               polylines: polyLineSet,
                               markers: markersSet,
-                              circles: circlesSet,
+                              // circles: circlesSet,
                               onMapCreated:
                                   (GoogleMapController controller) async {
                                 _controllerGoogleMap.complete(controller);
@@ -385,7 +398,7 @@ class _PickToDropPolyLineMapScreenState
                                   Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Text(
-                                      'Select Vehicle',
+                                      'Select Online Driver',
                                       style: nunitoSansStyle.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -468,6 +481,7 @@ class _PickToDropPolyLineMapScreenState
         startCap: Cap.roundCap,
         endCap: Cap.roundCap,
         geodesic: true,
+          width: 3
       );
 
       polyLineSet.add(polyline);
@@ -548,4 +562,5 @@ class _PickToDropPolyLineMapScreenState
       );
     });
   }
+
 }

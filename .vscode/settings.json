@@ -1,3 +1,10 @@
 {
-    "cSpell.words": ["Cupertino", "Fluttertoast", "Geolocator", "nunito", "roboto"]
+  "cSpell.words": [
+    "Cupertino",
+    "Fluttertoast",
+    "Geolocator",
+    "nunito",
+    "roboto"
+  ],
+  "liveServer.settings.multiRootWorkspaceName": "vt_partner"
 }

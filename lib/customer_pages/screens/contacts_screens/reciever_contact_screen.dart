@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
+import 'package:vt_partner/main.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/widgets/body_text1.dart';
@@ -21,10 +23,53 @@ class _ReceiverContactScreenState extends State<ReceiverContactScreen> {
   List<Contact>? _contacts; // List of contacts
   List<Contact>? _filteredContacts; // List to store filtered contacts
   String _searchTerm = ''; // Holds the search term
+  String receiverName = ''; // Holds the search term
+  String receiverNumber = ''; // Holds the search term
+  String customerNumber = ''; // Holds the search term
+
+  setReceiverDetailsToMyDetails() async {
+    final pref = await SharedPreferences.getInstance();
+    var customer_name = pref.getString("customer_name");
+    var customer_mobile_no = pref.getString("mobile_no");
+
+    if (customer_name != null && customer_mobile_no != null) {
+      AssistantMethods.saveReceiverContactDetails(
+          customer_name, customer_mobile_no, context);
+    } else {
+      MyApp.restartApp(context);
+    }
+  }
+
+  getReceiverDetails() async {
+    final pref = await SharedPreferences.getInstance();
+    var receiver_name = pref.getString("receiver_name");
+    var receiver_number = pref.getString("receiver_number");
+    var customer_name = pref.getString("customer_name");
+    var customer_mobile_no = pref.getString("mobile_no");
+
+    print("receiver_number::$receiver_number");
+    print("customer_mobile_no::$customer_mobile_no");
+    if (customer_mobile_no != null && customer_mobile_no!.isNotEmpty) {
+      customerNumber = customer_mobile_no;
+    }
+    // if (receiver_name == null || receiver_name.isEmpty) {
+    //   receiverName = customer_name.toString().split(" ")[0];
+    // } else {
+    //   receiverName = receiver_name;
+    // }
+
+    // if (receiver_number == null || receiver_number.isEmpty) {
+    //   receiverNumber = customer_mobile_no!;
+    // } else {
+    //   receiverNumber = receiver_number;
+    // }
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
+    getReceiverDetails();
     _loadContacts();
   }
 
@@ -142,7 +187,7 @@ class _ReceiverContactScreenState extends State<ReceiverContactScreen> {
                 ),
               ),
               subtitle: Text(
-                '8296565587',
+                '${customerNumber}',
                 style: nunitoSansStyle.copyWith(
                   color: Colors.grey,
                   fontSize: 14.0,
@@ -162,6 +207,7 @@ class _ReceiverContactScreenState extends State<ReceiverContactScreen> {
                 //   phoneNumber,
                 //   context,
                 // );
+                setReceiverDetailsToMyDetails();
                 Navigator.pop(context);
               },
             )),

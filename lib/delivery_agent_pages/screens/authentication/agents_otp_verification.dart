@@ -39,7 +39,7 @@ class _AgentOtpVerificationScreenState
 
   Future<void> loginAsync() async {
     final data = {
-      'mobile_no': "+91${glb.delivery_agent_mobile_no}",
+      'mobile_no': "${glb.delivery_agent_mobile_no}",
     };
 
     final pref = await SharedPreferences.getInstance();
@@ -55,7 +55,7 @@ class _AgentOtpVerificationScreenState
         await pref.setString("goods_driver_id",
             response["results"][0]["goods_driver_id"].toString());
 
-        await pref.setString("goods_driver_name",
+        await pref.setString("driver_name",
             response["results"][0]["driver_first_name"].toString());
         await pref.setString(
             "profile_pic", response["results"][0]["profile_pic"].toString());
@@ -71,7 +71,8 @@ class _AgentOtpVerificationScreenState
           Navigator.pushReplacementNamed(
               context, AgentDocumentVerificationRoute);
         } else {
-          Navigator.pushReplacementNamed(context, CustomerMainScreenRoute);
+          Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, AgentHomeScreenRoute);
         }
       } else if (response.containsKey("result")) {
         await pref.setString("goods_driver_id",

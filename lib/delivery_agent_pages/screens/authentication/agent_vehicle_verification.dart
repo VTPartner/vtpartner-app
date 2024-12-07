@@ -77,7 +77,7 @@ List<DropdownMenuItem<String>> _dropdownItems = [];
       if (e.toString().contains("No Data Found")) {
         glb.showToast("No Vehicles Found.");
       } else {
-        glb.showToast("An error occurred: ${e.toString()}");
+        //glb.showToast("An error occurred: ${e.toString()}");
       }
     }
   }

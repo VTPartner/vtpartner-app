@@ -6,8 +6,10 @@ import 'package:vt_partner/animation/fade_animation.dart';
 import 'package:vt_partner/animation/scale_and_revert_animation.dart';
 import 'package:vt_partner/animation/slide_bottom_animation.dart';
 import 'package:vt_partner/animation/slide_left_animation.dart';
+
 import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/routings/route_names.dart';
+
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/global/global.dart' as glb;
@@ -34,17 +36,35 @@ class _MySplashScreenState extends State<MySplashScreen> {
       final pref = await SharedPreferences.getInstance();
       var first_run = pref?.getString('first_run');
       var customer_id = pref?.getString('customer_id');
+      var mobile_no = pref?.getString('mobile_no');
+      var openCustomer = pref.getBool('openCustomer');
+      var openDriver = pref?.getBool('openDriver');
       // pref.setString("customer_id", "");
       // pref.setString("customer_name", "");
       var customer_name = pref?.getString('customer_name');
       if (customer_id != null &&
           customer_id.isNotEmpty &&
+          mobile_no != null &&
+          mobile_no.isNotEmpty &&
           customer_name != null &&
           customer_name.isNotEmpty &&
           customer_name != "NA") {
-        Navigator.pushReplacementNamed(context, CustomerMainScreenRoute);
+        if (openCustomer != null &&
+            openCustomer == true &&
+            openDriver != null &&
+            openDriver == false)
+          Navigator.pushReplacementNamed(context, CustomerMainScreenRoute);
+        else if (openCustomer != null &&
+            openCustomer == false &&
+            openDriver != null &&
+            openDriver == true)
+          Navigator.pushReplacementNamed(context, AgentHomeScreenRoute);
+        else
+          Navigator.pushReplacementNamed(context, CustomerMainScreenRoute);
       } else if (customer_id != null &&
           customer_id.isNotEmpty &&
+          mobile_no != null &&
+          mobile_no.isNotEmpty &&
           customer_name != null &&
           customer_name.isNotEmpty) {
         Navigator.pushReplacementNamed(context, NewCustomerDetailsRoute);
@@ -64,7 +84,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
       Position position = await getUserCurrentLocation();
       String humanReadableAddress =
           await AssistantMethods.searchAddressForGeographicCoOrdinates(
-              position!, context);
+              position!, context, false);
       
       print("MyLocation::" + humanReadableAddress);
       if (humanReadableAddress.isEmpty) {

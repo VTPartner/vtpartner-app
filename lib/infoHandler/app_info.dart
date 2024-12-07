@@ -1,4 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:vt_partner/customer_pages/models/active_booking_model.dart';
+import 'package:vt_partner/customer_pages/models/goods_type_model.dart';
 import 'package:vt_partner/models/contact_model.dart';
 import 'package:vt_partner/models/directions.dart';
 import 'package:vt_partner/models/pickup_location_map_direction.dart';
@@ -10,6 +12,8 @@ class AppInfo extends ChangeNotifier {
   Directions? userDropOfLocation;
   ContactModel? senderContactDetail;
   ContactModel? receiverContactDetail;
+  ActiveBookingModel? activeBookingDetail;
+  GoodsTypesModel? goodsTypesDetail;
   List<Stop>? userStopsList;
 
 
@@ -23,7 +27,7 @@ class AppInfo extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updatePickupLocationAddress(Directions userPickupAddress) {
+  void updatePickupLocationAddress(Directions? userPickupAddress) {
     userPickupLocation = userPickupAddress;
     notifyListeners();
   }
@@ -50,6 +54,16 @@ class AppInfo extends ChangeNotifier {
 
   void updateReceiverContactDetails(ContactModel? contactModel) {
     receiverContactDetail = contactModel;
+    notifyListeners();
+  }
+
+  void updateBookingDetails(ActiveBookingModel? activeBookingModel) {
+    activeBookingDetail = activeBookingModel;
+    notifyListeners();
+  }
+
+  void updateGoodsTypeDetails(GoodsTypesModel? goodsTypesModel) {
+    goodsTypesDetail = goodsTypesModel;
     notifyListeners();
   }
 

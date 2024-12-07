@@ -5,7 +5,14 @@ class ActiveNearByGoodsDrivers {
   String? driverName;
   String? driverProfilePic;
   String? vehicleImage;
+  String? vehicleSizeImage;
+  int? vehicleId;
   String? vehicleName;
+  String? arrivalTime;
+  String? arrivalDistance;
+  String? vehicleWeight;
+  double? perKmPrice;
+  double? basePrice;
 
   ActiveNearByGoodsDrivers({
     required this.driverId,
@@ -14,10 +21,17 @@ class ActiveNearByGoodsDrivers {
     required this.driverName,
     required this.driverProfilePic,
     required this.vehicleImage,
+    required this.vehicleSizeImage,
     required this.vehicleName,
+    required this.vehicleWeight,
+    required this.perKmPrice,
+    required this.basePrice,
+    required this.vehicleId,
+    this.arrivalTime,
+    this.arrivalDistance,
+
   });
 
-  // Factory method to create a Service object from a map (e.g., from JSON response)
   factory ActiveNearByGoodsDrivers.fromJson(Map<String, dynamic> json) {
     return ActiveNearByGoodsDrivers(
       driverId: json['goods_driver_id'],
@@ -26,11 +40,15 @@ class ActiveNearByGoodsDrivers {
       driverName: json['driver_name'],
       driverProfilePic: json['driver_profile_pic'],
       vehicleImage: json['vehicle_image'],
+      vehicleSizeImage: json['size_image'],
       vehicleName: json['vehicle_name'],
+      vehicleWeight: json['weight'],
+      perKmPrice: json['starting_price_per_km'],
+      basePrice: json['base_fare'],
+      vehicleId: json['vehicle_id'],
     );
   }
 
-  // Method to convert Service object to JSON (for sending to an API)
   Map<String, dynamic> toJson() {
     return {
       'goods_driver_id': driverId,
@@ -39,7 +57,14 @@ class ActiveNearByGoodsDrivers {
       'driver_name': driverName,
       'driver_profile_pic': driverProfilePic,
       'vehicle_image': vehicleImage,
+      'size_image': vehicleSizeImage,
       'vehicle_name': vehicleName,
+      'weight': vehicleWeight,
+      'starting_price_per_km': perKmPrice,
+      'base_fare': basePrice,
+      'vehicle_id': vehicleId,
+      'arrival_time': arrivalTime,
+      'arrival_distance': arrivalDistance,
     };
   }
 }

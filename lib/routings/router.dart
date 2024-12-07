@@ -1,4 +1,12 @@
 import 'package:flutter/cupertino.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:vt_partner/apps/customer_app/pages/auth/login.dart';
+import 'package:vt_partner/apps/customer_app/pages/auth/register.dart';
+import 'package:vt_partner/apps/customer_app/pages/auth/verification.dart';
+import 'package:vt_partner/apps/customer_app/pages/onboardings/onboarding.dart';
+import 'package:vt_partner/apps/goods_driver_app/pages/auth/login.dart';
+import 'package:vt_partner/apps/goods_driver_app/pages/auth/verification.dart';
+import 'package:vt_partner/apps/goods_driver_app/pages/home/home.dart';
 
 
 import 'package:vt_partner/customer_pages/screens/authentication/customer_login.dart';
@@ -53,18 +61,23 @@ import 'package:vt_partner/splash_screen.dart';
 import '../customer_pages/screens/main_screens/customer_main_screen.dart';
 import '../customer_pages/screens/ride_details/ongoing_ride_details_screen.dart';
 import 'route_names.dart';
+import '../delivery_agent_pages/screens/new_trip_screen/new_trip_screen.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   // print('generateRoute: ${settings.name}');
   switch (settings.name) {
     case OnBoardingRoute:
-      return _getPageRoute(const CustomerOnBoardingScreen());
+      return _getPageRoute(const OnboardingScreen());
+    // return _getPageRoute(const CustomerOnBoardingScreen());
     case CustomerLoginRoute:
-      return _getPageRoute(const CustomerLoginScreen());
+      return _getPageRoute(const LoginScreen());
+    // return _getPageRoute(const CustomerLoginScreen());
     case NewCustomerDetailsRoute:
-      return _getPageRoute(const NewCustomerDetailsScreen());
+      return _getPageRoute(const RegisterScreen());
+    // return _getPageRoute(const NewCustomerDetailsScreen());
     case CustomerOTPVerificationRoute:
-      return _getPageRoute(const CustomerOTPVerificationScreen());
+      return _getPageRoute(const VerificationScreen());
+    // return _getPageRoute(const CustomerOTPVerificationScreen());
     case CustomerMainScreenRoute:
       // return _getPageRoute(const HomeScreenTabPage());
       return _getPageRoute(const CustomerMainScreen());
@@ -80,6 +93,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(const LocateOnMapPickupLocation());
     case DropLocateOnMapRoute:
       return _getPageRoute(const DropLocationLocateOnMap());
+
 
     //Goods Booking Sequence
     case ServiceTypesRoute:
@@ -110,9 +124,11 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 //Agent Routes
 
     case AgentLoginRoute:
-      return _getPageRoute(const AgentLoginScreen());
+      return _getPageRoute(const GoodsDriverLoginScreen());
+    // return _getPageRoute(const AgentLoginScreen());
     case AgentOTPRoute:
-      return _getPageRoute(const AgentOtpVerificationScreen());
+      return _getPageRoute(const GoodsDriverVerificationScreen());
+    // return _getPageRoute(const AgentOtpVerificationScreen());
     case AgentDocumentVerificationRoute:
       return _getPageRoute(const AgentDocumentVerificationScreen());
     case AgentVehicleDocumentVerificationRoute:
@@ -120,9 +136,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case AgentOwnerDetailsRoute:
       return _getPageRoute(const VehicleOwnerDetailsScreen());
     case AgentHomeScreenRoute:
-      return _getPageRoute(const AgentHomeScreen());
-    case AgentHomeScreenRoute:
-      return _getPageRoute(const AgentHomeScreen());
+      return _getPageRoute(const GoodsDriverHomeScreen());
+    // return _getPageRoute(const AgentHomeScreen());
     case AgentSettingsRoute:
       return _getPageRoute(const AgentSettingsScreen());
     case AadharCardUploadRoute:
@@ -133,6 +148,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(DrivingLicenseUploadScreen());
     case OwnerSelfieUploadRoute:
       return _getPageRoute(OwnerSelfieUpload());
+    case NewTripDetailsRoute:
+      return _getPageRoute(NewTripScreen());
     //Vehicle Documents upload
     case VehicleImagesUploadRoute:
       return _getPageRoute(VehicleImageUpload());
@@ -176,5 +193,9 @@ Route<dynamic> generateRoute(RouteSettings settings) {
 }
 
 PageRoute _getPageRoute(Widget child) {
-  return CupertinoPageRoute(builder: (context) => child);
+  return PageTransition(
+    child: child,
+    type: PageTransitionType.rightToLeft,
+  );
+  // return CupertinoPageRoute(builder: (context) => child);
 }

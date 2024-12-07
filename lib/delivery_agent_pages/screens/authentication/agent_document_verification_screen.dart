@@ -77,7 +77,7 @@ String? _selectedGender;
       if (e.toString().contains("No Data Found")) {
         glb.showToast("No Cities Found.");
       } else {
-        glb.showToast("An error occurred: ${e.toString()}");
+        //glb.showToast("An error occurred: ${e.toString()}");
       }
     }
   }

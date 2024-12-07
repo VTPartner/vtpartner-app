@@ -14,6 +14,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:requestLegacyExternalStorage="true">
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -36,6 +37,7 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
@@ -45,6 +47,27 @@
 
             <meta-data android:name="com.google.android.geo.API_KEY"
                android:value="AIzaSyAAlmEtjJOpSaJ7YVkMKwdSuMTbTx39l_o"/>
+
+                <meta-data
+            android:name="firebase_messaging_auto_init_enabled"
+            android:value="false" />
+        <meta-data
+            android:name="firebase_analytics_collection_enabled"
+            android:value="false" />
+
+            <!-- for notification channel  -->
+            <meta-data
+        android:name="com.google.firebase.messaging.default_notification_channel_id"
+        android:value="high_importance_channel" />
+
+            <!-- Firebase messaging service  -->
+            <receiver
+        android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver"
+        android:exported="false">
+        <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

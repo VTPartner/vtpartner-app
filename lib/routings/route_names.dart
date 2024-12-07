@@ -28,6 +28,7 @@ const String AgentLoginRoute = "agent_login";
 const String AgentOTPRoute = "agent_otp";
 const String AgentDocumentVerificationRoute = "agent_document_verification";
 const String AgentOwnerDetailsRoute = "agent_owner_verification";
+const String NewTripDetailsRoute = "new_trip_details";
 const String AgentVehicleDocumentVerificationRoute =
     "agent_vehicle_document_verification";
 const String AgentSettingsRoute = "agent_settings";

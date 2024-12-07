@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:provider/provider.dart';
+import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/global/map_key.dart';
 import 'dart:convert';
@@ -39,6 +41,46 @@ class _CabUserSearchPickupLocationScreenState
   List<PredictedPlaces> _placesPredictedList = [];
   var hideSuggestion = false;
 
+Future<void> _getUserLocationAndAddress() async {
+    print("obtain address");
+    try {
+      Position position = await getUserCurrentLocation();
+      String humanReadableAddress =
+          await AssistantMethods.searchAddressForGeographicCoOrdinates(
+              position!, context, true);
+      final appInfo = Provider.of<AppInfo>(context, listen: false);
+      var locationId = appInfo.userCurrentLocation?.locationId;
+      var latitude = appInfo.userCurrentLocation?.locationLatitude;
+      var longitude = appInfo.userCurrentLocation?.locationLongitude;
+      var full_address = appInfo.userCurrentLocation?.locationName;
+      var pincode = appInfo.userCurrentLocation?.pinCode;
+
+      Directions userCurrentLocation = Directions();
+      userCurrentLocation.locationLatitude = latitude;
+      userCurrentLocation.locationLongitude = longitude;
+      userCurrentLocation.pinCode = pincode;
+      userCurrentLocation.locationName = full_address;
+      userCurrentLocation.locationId = locationId;
+      Provider.of<AppInfo>(context, listen: false)
+          .updatePickupLocationAddress(userCurrentLocation);
+
+      print("MyCurrent Location::" + humanReadableAddress);
+      Navigator.pushNamed(context, DropLocateOnMapRoute);
+    } catch (e) {}
+  }
+
+  Future<Position> getUserCurrentLocation() async {
+    await Geolocator.requestPermission()
+        .then((value) {})
+        .onError((error, stackTrace) {
+      print("Error:::" + error.toString());
+    });
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+  
   @override
   void initState() {
     super.initState();

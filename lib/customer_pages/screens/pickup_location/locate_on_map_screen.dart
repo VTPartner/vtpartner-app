@@ -7,16 +7,20 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/global/map_key.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
+import 'package:vt_partner/main.dart';
+import 'package:vt_partner/models/contact_model.dart';
 import 'package:vt_partner/models/directions.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/widgets/description_text.dart';
 import 'package:vt_partner/widgets/google_textform.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
 class LocateOnMapPickupLocation extends StatefulWidget {
   const LocateOnMapPickupLocation({super.key});
@@ -39,6 +43,8 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
   );
 
   var _address = "";
+  double bottomPaddingOfMap = 0.0;
+  bool _isServiceAvailable = false;
   bool isLoading = false; // To track the loading state
   Timer? _debounce;
 
@@ -69,7 +75,12 @@ class _LocateOnMapPickupLocationState extends State<LocateOnMapPickupLocation> {
   late LatLng _userLocation;
   bool _locationInitialized = false;
   String placeId = "";
-AppInfo? appInfo;
+  AppInfo? appInfo;
+  String senderName = "", senderNumber = "", customerNumber = "";
+  TextEditingController numberTextEditingController = TextEditingController();
+  TextEditingController nameTextEditingController = TextEditingController();
+  bool isNumberEdited = false;
+  bool isNameEdited = false;
 
   @override
   void didChangeDependencies() {
@@ -78,11 +89,57 @@ AppInfo? appInfo;
     appInfo = Provider.of<AppInfo?>(context, listen: false);
   }
 
+  setSenderDetailsToMyDetails() async {
+    final pref = await SharedPreferences.getInstance();
+    var customer_name = pref.getString("customer_name");
+    var customer_mobile_no = pref.getString("mobile_no");
+
+    if (customer_name != null && customer_mobile_no != null) {
+      customerNumber = customer_mobile_no;
+      AssistantMethods.saveSenderContactDetails(
+          customer_name, customer_mobile_no, context);
+    } else {
+      MyApp.restartApp(context);
+    }
+    setState(() {});
+  }
+
+  getSenderDetails() async {
+    final pref = await SharedPreferences.getInstance();
+    var sender_name = pref.getString("sender_name");
+    var sender_number = pref.getString("sender_number");
+    var customer_name = pref.getString("customer_name");
+    var customer_mobile_no = pref.getString("mobile_no");
+    if (customer_mobile_no != null && customer_mobile_no.isNotEmpty) {
+      customerNumber = customer_mobile_no;
+    }
+    print("sender_number::$sender_number");
+    print("customer_mobile_no::$customer_mobile_no");
+    if (sender_number == customer_mobile_no) {
+      setState(() {
+        _isChecked = true;
+      });
+    }
+    // if (sender_name == null || sender_name.isEmpty) {
+    //   nameTextEditingController.text =
+    //       senderName = customer_name.toString().split(" ")[0];
+    // } else {
+    //   nameTextEditingController.text = senderName = sender_name;
+    // }
+
+    // if (sender_number == null || sender_number.isEmpty) {
+    //   numberTextEditingController.text = senderNumber = customer_mobile_no!;
+    // } else {
+    //   numberTextEditingController.text = senderNumber = sender_number;
+    // }
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
     _currentPosition = _kGooglePlex;
+    getSenderDetails();
     print("init pickup location map");
     _setUserLocationMarker(context);
   }
@@ -100,7 +157,6 @@ AppInfo? appInfo;
 
   Future<void> _setUserLocationMarker(context) async {
     getUserCurrentLocation().then((value) async {
-
       if (appInfo?.userPickupLocation != null) {
         var locationLatitude = appInfo?.userPickupLocation!.locationLatitude;
         var locationLongitude = appInfo?.userPickupLocation!.locationLongitude;
@@ -144,9 +200,6 @@ AppInfo? appInfo;
 
       setState(() {});
     });
-
-    
-    
   }
 
   onCameraMove(CameraPosition? position) {
@@ -186,7 +239,6 @@ AppInfo? appInfo;
   double _latitude = 0.0;
   double _longitude = 0.0;
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -200,12 +252,16 @@ AppInfo? appInfo;
                 child: Stack(
                   children: [
                     GoogleMap(
+                      padding: EdgeInsets.only(bottom: bottomPaddingOfMap),
                       initialCameraPosition: _currentPosition,
                       mapType: MapType.normal,
                       myLocationButtonEnabled: false,
                       myLocationEnabled: false,
                       onCameraMove: onCameraMove,
                       onMapCreated: (GoogleMapController controller) {
+                        setState(() {
+                          bottomPaddingOfMap = 325.0;
+                        });
                         _controller.complete(controller);
                       },
                     ),
@@ -216,19 +272,19 @@ AppInfo? appInfo;
                         top: MediaQuery.of(context).size.height / 2 -
                             22.5, // Center vertically
                         child: SvgPicture.asset(
-                          "assets/svg/blue_pin.svg",
+                          "assets/svg/blue_pinbar.svg",
                           // color: Colors.green[600],
-                          width: 45,
-                          height: 45,
+                          width: 55,
+                          height: 55,
                         ),
                       ),
                     _showBottomSheet
                         ? Positioned(
-                        left: 0,
-                        right: 0,
-                        top: MediaQuery.of(context).size.height / 2 -
-                            65, // Adjust for tooltip position
-                        child: CustomTooltip(
+                            left: 0,
+                            right: 0,
+                            top: MediaQuery.of(context).size.height / 2 -
+                                65, // Adjust for tooltip position
+                            child: CustomTooltip(
                                 message: 'This is your Pickup Location'))
                         : SizedBox(),
                     SafeArea(
@@ -256,228 +312,440 @@ AppInfo? appInfo;
                 ),
               ),
         bottomSheet: _showBottomSheet
-            ? Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15)),
-                      child: TextField(
-                        textInputAction: TextInputAction.done,
-                        style: nunitoSansStyle.copyWith(
-                          fontSize: 12.0, // Adjust the font size as needed
-                          color: Colors.grey[
-                              900], // You can also change the text color if necessary
-                        ),
-                        readOnly: true,
-                        controller: TextEditingController(
-                            text: Provider.of<AppInfo>(context)
-                                        .userPickupLocation !=
-                                    null
-                                ? Provider.of<AppInfo>(context)
-                                    .userPickupLocation!
-                                    .locationName!
-                                : "Please wait ..."),
-                        decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 15),
-                          border: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.1, // Adjust the border width here
+            ? Consumer<AppInfo>(builder: (context, appInfo, child) {
+                // Update the TextEditingController's text if senderContactDetail changes
+                final senderContact = appInfo.senderContactDetail;
+                // senderContact.contactNumber !=
+                //     numberTextEditingController.text
+                if (senderContact != null) {
+                  // Update the controllers only if the user hasn't edited them
+                  if (!isNumberEdited &&
+                      numberTextEditingController.text !=
+                          senderContact.contactNumber) {
+                    numberTextEditingController.text =
+                        senderContact.contactNumber!;
+                  }
+                  if (!isNameEdited &&
+                      nameTextEditingController.text !=
+                          senderContact.contactName) {
+                    nameTextEditingController.text = senderContact.contactName!;
+                  }
+                }
+
+                return Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15)),
+                        child: TextField(
+                          textInputAction: TextInputAction.done,
+                          style: nunitoSansStyle.copyWith(
+                            fontSize: 12.0, // Adjust the font size as needed
+                            color: Colors.grey[
+                                900], // You can also change the text color if necessary
+                          ),
+                          readOnly: true,
+                          controller: TextEditingController(
+                              text: Provider.of<AppInfo>(context)
+                                          .userPickupLocation !=
+                                      null
+                                  ? Provider.of<AppInfo>(context)
+                                      .userPickupLocation!
+                                      .locationName!
+                                  : "Please wait ..."),
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 15),
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 0.1, // Adjust the border width here
+                              ),
                             ),
+                            labelText: 'Pickup Location',
+                            labelStyle: nunitoSansStyle.copyWith(
+                              color: Colors.black,
+                              fontSize: 16,
+                            ),
+                            hintText: 'Pickup Location',
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
                           ),
-                          labelText: 'Pickup Location',
-                          labelStyle: nunitoSansStyle.copyWith(
-                            color: Colors.black,
-                            fontSize: 16,
-                          ),
-                          hintText: 'Pickup Location',
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
                         ),
                       ),
-                    ),
-                    SizedBox(height: kHeight),
-                    GoogleTextFormField(
-                        readOnly: true,
-                        textEditingController: TextEditingController(
-                            text: Provider.of<AppInfo>(context)
-                                        .senderContactDetail !=
-                                    null
-                                ? Provider.of<AppInfo>(context)
-                                    .senderContactDetail!
-                                    .contactName!
-                                : ""),
-                        hintText: "Enter Sender Name",
-                        textInputType: TextInputType.text,
-                        labelText: 'Sender Name'),
-                    SizedBox(height: kHeight),
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(15)),
-                      child: TextField(
-                        readOnly: true,
-                        textInputAction: TextInputAction.done,
-                        style: nunitoSansStyle.copyWith(
-                          fontSize: 12.0, // Adjust the font size as needed
-                          color: Colors.grey[
-                              900], // You can also change the text color if necessary
-                        ),
-                        controller: TextEditingController(
-                            text: Provider.of<AppInfo>(context)
-                                        .senderContactDetail !=
-                                    null
-                                ? Provider.of<AppInfo>(context)
-                                    .senderContactDetail!
-                                    .contactNumber!
-                                : ""),
-                        keyboardType: TextInputType.phone,
-                        textCapitalization: TextCapitalization.words,
-                        decoration: InputDecoration(
-                          suffixIcon: IconButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, SenderContactRoute);
-                              },
-                              icon: Icon(
-                                Icons.contact_phone_rounded,
-                                color: ThemeClass.facebookBlue,
-                                size: 16,
-                              )),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 15),
-                          border: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                              width: 0.1, // Adjust the border width here
-                            ),
-                          ),
-                          labelText: 'Sender Mobile Number',
-                          labelStyle: nunitoSansStyle.copyWith(
-                            color: Colors.black,
-                            fontSize: 14,
-                          ),
-                          hintText: "Enter Sender Mobile Number",
-                          hintStyle: nunitoSansStyle.copyWith(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                          floatingLabelBehavior: FloatingLabelBehavior.always,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: kHeight),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _isChecked = !_isChecked;
-                            });
+                      SizedBox(height: kHeight),
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15)),
+                        child: TextField(
+                          onChanged: (value) {
+                            isNameEdited =
+                                true; // Mark as edited when the user modifies it
                           },
-                          child: Container(
-                            width: 24, // Adjusted for better visual alignment
-                            height: 24, // Adjusted for better visual alignment
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(
-                                color: _isChecked
-                                    ? ThemeClass.facebookBlue
-                                    : Colors.grey,
-                                width: 2,
+                          textInputAction: TextInputAction.done,
+                          style: nunitoSansStyle.copyWith(
+                            fontSize: 12.0, // Adjust the font size as needed
+                            color: Colors.grey[
+                                900], // You can also change the text color if necessary
+                          ),
+                          controller: nameTextEditingController,
+                          keyboardType: TextInputType.text,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 15),
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 0.1, // Adjust the border width here
                               ),
                             ),
-                            child: _isChecked
-                                ? Center(
-                                    child: Icon(
-                                      Icons.check,
-                                      size:
-                                          20, // Adjusted size to fit within the container
-                                      color: ThemeClass.facebookBlue,
-                                    ),
-                                  )
-                                : null,
+                            labelText: 'Sender Name',
+                            labelStyle: nunitoSansStyle.copyWith(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+                            hintText: "Enter Sender Name",
+                            hintStyle: nunitoSansStyle.copyWith(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        DescriptionText(
-                            descriptionText: 'Use my mobile number. 8296565587')
-                      ],
-                    ),
-                    SizedBox(height: kHeight),
-                    isLoading
-                        ? Center(
-                            child: SizedBox(
-                              height: 20,
-                              width: 20,
-                              child:
-                                  CircularProgressIndicator(), // Loading animation
-                            ),
-                          )
-                        : Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () async {
-                                if (_latitude != 0.0 || _longitude != 0.0) {
-                                  await getAddressFromLatLng(
-                                      _latitude, _longitude);
-                                  Navigator.pop(context);
-                                  Navigator.pop(context);
-                                } else {
-                                  print("LatLng Error");
-                                }
-                                
-                              },
-                              child: Ink(
-                                decoration: BoxDecoration(
-                                  image: const DecorationImage(
-                                      image: AssetImage(
-                                          "assets/images/buttton_bg.png"),
-                                      fit: BoxFit.cover),
+                      ),
+                      // GoogleTextFormField(
+                      //     readOnly: false,
+                      //     textEditingController: nameTextEditingController,
+                      //     hintText: "Enter Sender Name",
+                      //     textInputType: TextInputType.text,
+                      //     labelText: 'Sender Name'),
+                      SizedBox(height: kHeight),
+                      Container(
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(15)),
+                        child: TextField(
+                          readOnly: false,
+                          textInputAction: TextInputAction.done,
+                          style: nunitoSansStyle.copyWith(
+                            fontSize: 12.0, // Adjust the font size as needed
+                            color: Colors.grey[
+                                900], // You can also change the text color if necessary
+                          ),
+                          onChanged: (value) {
+                            isNumberEdited =
+                                true; // Mark as edited when the user modifies it
+                          },
+                          controller: numberTextEditingController,
+                          keyboardType: TextInputType.phone,
+                          textCapitalization: TextCapitalization.words,
+                          decoration: InputDecoration(
+                            suffixIcon: IconButton(
+                                onPressed: () {
+                                  Navigator.pushNamed(
+                                      context, SenderContactRoute);
+                                },
+                                icon: Icon(
+                                  Icons.contact_phone_rounded,
                                   color: ThemeClass.facebookBlue,
-                                  borderRadius: BorderRadius.circular(16.0),
+                                  size: 16,
+                                )),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 15),
+                            border: const OutlineInputBorder(
+                              borderSide: BorderSide(
+                                width: 0.1, // Adjust the border width here
+                              ),
+                            ),
+                            labelText: 'Sender Mobile Number',
+                            labelStyle: nunitoSansStyle.copyWith(
+                              color: Colors.black,
+                              fontSize: 14,
+                            ),
+                            hintText: "Enter Sender Mobile Number",
+                            hintStyle: nunitoSansStyle.copyWith(
+                              color: Colors.grey,
+                              fontSize: 12,
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior.always,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: kHeight),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () async {
+                              setState(() {
+                                _isChecked = !_isChecked;
+                              });
+
+                              if (_isChecked) {
+                                setSenderDetailsToMyDetails(); // Call function to set sender details
+                              } else {
+                                final pref =
+                                    await SharedPreferences.getInstance();
+                                pref.setString("sender_name", "");
+                                pref.setString("sender_number", "");
+                                nameTextEditingController.text = "";
+                                numberTextEditingController.text = "";
+                                Provider.of<AppInfo>(context, listen: false)
+                                    .updateSenderContactDetails(
+                                        null); // Clear sender details
+                              }
+                            },
+                            child: Container(
+                              width: 24, // Width of the checkbox
+                              height: 24, // Height of the checkbox
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: _isChecked
+                                      ? ThemeClass.facebookBlue
+                                      : Colors.grey,
+                                  width: 2,
                                 ),
-                                child: Stack(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(16.0),
-                                          child: Text(
-                                            'Confirm Pickup Location',
-                                            style: nunitoSansStyle.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                              fontSize: Theme.of(context)
-                                                  .textTheme
-                                                  .bodyMedium
-                                                  ?.fontSize,
-                                            ),
-                                            overflow: TextOverflow.visible,
+                              ),
+                              child: customerNumber ==
+                                      numberTextEditingController.text
+                                  ? Center(
+                                      child: Icon(
+                                        Icons.check,
+                                        size: 20,
+                                        color: ThemeClass.facebookBlue,
+                                      ),
+                                    )
+                                  : _isChecked
+                                      ? Center(
+                                          child: Icon(
+                                            Icons.check,
+                                            size: 20,
+                                            color: ThemeClass.facebookBlue,
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                        )
+                                      : null, // Only show the check icon if `_isChecked` is true
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          DescriptionText(
+                            descriptionText:
+                                'Use my mobile number. ${customerNumber}',
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: kHeight),
+                      isLoading
+                          ? Center(
+                              child: SizedBox(
+                                height: 20,
+                                width: 20,
+                                child:
+                                    CircularProgressIndicator(), // Loading animation
+                              ),
+                            )
+                          : Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () async {
+                                  savePickupLocationDetails();
+                                },
+                                child: Ink(
+                                  decoration: BoxDecoration(
+                                    image: const DecorationImage(
+                                        image: AssetImage(
+                                            "assets/images/buttton_bg.png"),
+                                        fit: BoxFit.cover),
+                                    color: ThemeClass.facebookBlue,
+                                    borderRadius: BorderRadius.circular(16.0),
+                                  ),
+                                  child: Stack(
+                                    children: [
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Text(
+                                              'Confirm Pickup Location',
+                                              style: nunitoSansStyle.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                                fontSize: Theme.of(context)
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.fontSize,
+                                              ),
+                                              overflow: TextOverflow.visible,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                  
-                  ],
-                ),
-              )
+                    ],
+                  ),
+                );
+              })
             : null);
   }
-}
 
+  Future<void> checkServiceAvailable() async {
+    final appInfo = Provider.of<AppInfo>(context, listen: false);
+    var latitude = appInfo.userPickupLocation?.locationLatitude;
+    var longitude = appInfo.userPickupLocation?.locationLongitude;
+    var full_address = appInfo.userPickupLocation?.locationName;
+    var pincode = appInfo.userPickupLocation?.pinCode;
+    if (full_address == null) {
+      MyApp.restartApp(context);
+    }
+    final data = {'pincode': pincode};
+
+    final pref = await SharedPreferences.getInstance();
+
+    setState(() {
+      _isServiceAvailable = false;
+      isLoading = true;
+    });
+
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/allowed_pin_code', data);
+      if (kDebugMode) {
+        print(response);
+      }
+      // Check if the response contains 'results' key and parse it
+      if (response['results'] != null) {
+        await pref.setString(
+            "pickup_city_id", response["results"][0]["city_id"].toString());
+        setState(() {
+          _isServiceAvailable = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _isServiceAvailable = false;
+        isLoading = false;
+      });
+      pref.setString("pickup_city_id", "");
+      if (kDebugMode) {
+        print(e);
+      }
+      if (e.toString().contains("No Data Found")) {
+        //glb.showToast("No Services Found.");
+
+        _showServiceUnavailableBottomSheet(context);
+      } else {
+        //glb.showToast("An error occurred: ${e.toString()}");
+      }
+    }
+  }
+
+  savePickupLocationDetails() async {
+    await checkServiceAvailable();
+    var sender_name = nameTextEditingController.text.toString().trim();
+    var sender_number = numberTextEditingController.text.toString().trim();
+    var numberCheck = sender_number;
+    if (_latitude == 0.0 || _longitude == 0.0) {
+      glb.showToast(
+          "Please try after sometime we are not able to fetch your location");
+      return;
+    }
+
+    if (sender_name.isEmpty) {
+      glb.showToast("Please provide sender name.");
+      return;
+    }
+    if (sender_number.isEmpty) {
+      glb.showToast("Please provide sender number.");
+      return;
+    }
+    if (numberCheck.startsWith("+91")) {
+      // Ensure the number after "+91" has exactly 10 digits
+      if (numberCheck.length != 13 ||
+          !RegExp(r'^\+91\d{10}$').hasMatch(numberCheck)) {
+        glb.showToast(
+            "Please provide a valid 10-digit sender phone number with or without +91.");
+        return;
+      }
+    } else {
+      // Validate for exactly 10 digits without "+91"
+      if (numberCheck.length != 10 ||
+          !RegExp(r'^\d{10}$').hasMatch(numberCheck)) {
+        glb.showToast("Please provide a valid 10-digit sender phone number.");
+        return;
+      }
+    }
+
+    if (_isServiceAvailable == false) {
+      return;
+    }
+
+    AssistantMethods.saveSenderContactDetails(
+        sender_name, numberCheck, context);
+
+    if (_latitude != 0.0 || _longitude != 0.0) {
+      await getAddressFromLatLng(_latitude, _longitude);
+      Navigator.pushNamed(context, PickUpAndDropBookingLocationsRoute);
+      // Navigator.pop(context);
+      // Navigator.pop(context);
+    } else {
+      print("LatLng Error");
+    }
+  }
+
+  void _showServiceUnavailableBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: true,
+      enableDrag: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          width: MediaQuery.of(context).size.width,
+          height: 300, // Set the height according to your design
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Circular Image
+              CircleAvatar(
+                radius: 50, // Adjust radius as needed
+                backgroundImage: const AssetImage(
+                    'assets/images/no_service.png'), // Add your image path here
+                backgroundColor: Colors.grey[
+                    200], // Optional: background color if the image fails to load
+              ),
+              const SizedBox(height: 20), // Spacing between image and text
+              // Message Text
+              Text(
+                Provider.of<AppInfo>(context).userPickupLocation != null
+                    ? 'Unfortunately, we do not currently offer services in \n${Provider.of<AppInfo>(context).userPickupLocation!.locationName!} for this postal code.\n Please try a different location.'
+                    : "Unable to retrieve your location. Please try again shortly.",
+                textAlign: TextAlign.center,
+                style: nunitoSansStyle.copyWith(
+                  color: Colors.grey[800],
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+}
 
 class CustomTooltip extends StatelessWidget {
   final String message;
@@ -497,8 +765,7 @@ class CustomTooltip extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0)),
           child: Text(
             message,
-            style: TextStyle(
-              color: Colors.black, fontSize: 10.0
+            style: TextStyle(color: Colors.black, fontSize: 10.0
             ),
           ),
         ),

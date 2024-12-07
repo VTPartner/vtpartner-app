@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
@@ -91,12 +92,15 @@ class _ServiceTypeScreenState extends State<ServiceTypeScreen> {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
-                    onTap: () {
+                    onTap: () async {
+                      final pref = await SharedPreferences.getInstance();
+                      
                       if (index == 1) {
                         Fluttertoast.showToast(
                             msg: 'Coming Soon', gravity: ToastGravity.BOTTOM);
                         return;
                       }
+                      pref.setString("service_type", "local");
                       Navigator.pushNamed(
                           context, PickUpAndDropBookingLocationsRoute);
                     },

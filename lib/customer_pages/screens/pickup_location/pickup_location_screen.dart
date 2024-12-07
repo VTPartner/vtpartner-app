@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_places_flutter/google_places_flutter.dart';
 import 'package:google_places_flutter/model/prediction.dart';
 import 'package:provider/provider.dart';
+import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/global/map_key.dart';
 import 'dart:convert';
@@ -36,6 +38,45 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
   List<PredictedPlaces> _placesPredictedList = [];
   var hideSuggestion = false;
 
+Future<void> _getUserLocationAndAddress() async {
+    print("obtain address");
+    try {
+      Position position = await getUserCurrentLocation();
+      String humanReadableAddress =
+          await AssistantMethods.searchAddressForGeographicCoOrdinates(
+              position!, context, true);
+      final appInfo = Provider.of<AppInfo>(context, listen: false);
+      var locationId = appInfo.userCurrentLocation?.locationId;
+      var latitude = appInfo.userCurrentLocation?.locationLatitude;
+      var longitude = appInfo.userCurrentLocation?.locationLongitude;
+      var full_address = appInfo.userCurrentLocation?.locationName;
+      var pincode = appInfo.userCurrentLocation?.pinCode;
+
+      Directions userCurrentLocation = Directions();
+      userCurrentLocation.locationLatitude = latitude;
+      userCurrentLocation.locationLongitude = longitude;
+      userCurrentLocation.pinCode = pincode;
+      userCurrentLocation.locationName = full_address;
+      userCurrentLocation.locationId = locationId;
+      Provider.of<AppInfo>(context, listen: false)
+          .updatePickupLocationAddress(userCurrentLocation);
+
+      print("MyCurrent Location::" + humanReadableAddress);
+      Navigator.pushNamed(context, LocateOnMapPickupLocationRoute);
+    } catch (e) {}
+  }
+
+  Future<Position> getUserCurrentLocation() async {
+    await Geolocator.requestPermission()
+        .then((value) {})
+        .onError((error, stackTrace) {
+      print("Error:::" + error.toString());
+    });
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
   @override
   void initState() {
     super.initState();
@@ -333,32 +374,115 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              InkWell(
-                onTap: () {
-                  Navigator.pushNamed(context, LocateOnMapPickupLocationRoute);
-                },
-                child: Row(
+          padding: const EdgeInsets.all(8.0),
+          child: SizedBox(
+            height: 100,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Icon(
-                      Icons.pin_drop_rounded,
-                      color: Colors.grey,
+                    InkWell(
+                      onTap: () async {
+                        _getUserLocationAndAddress();
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on_rounded,
+                            color: Colors.grey,
+                            size: 15,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "Use my current location",
+                            style: nunitoSansStyle.copyWith(fontSize: 12.0),
+                          ),
+                        ],
+                      ),
                     ),
-                    SizedBox(
-                      width: 10,
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                      ),
+                      width: 2,
+                      height: 10,
                     ),
-                    Text(
-                      "Locate on the Map",
-                      style: nunitoSansStyle.copyWith(fontSize: 14.0),
-                    ),
+                    InkWell(
+                      onTap: () async {
+                        Navigator.pushNamed(
+                            context, LocateOnMapPickupLocationRoute);
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.map_sharp,
+                            color: Colors.grey,
+                            size: 15,
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text(
+                            "Locate on the Map",
+                            style: nunitoSansStyle.copyWith(fontSize: 12.0),
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
-            ],
+                SizedBox(
+                  height: kHeight,
+                ),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () async {
+                      Navigator.pushNamed(
+                          context, LocateOnMapPickupLocationRoute);
+                    },
+                    child: Ink(
+                      decoration: BoxDecoration(
+                        image: const DecorationImage(
+                            image: AssetImage("assets/images/buttton_bg.png"),
+                            fit: BoxFit.cover),
+                        color: ThemeClass.facebookBlue,
+                        borderRadius: BorderRadius.circular(16.0),
+                      ),
+                      child: Stack(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  'Continue',
+                                  style: nunitoSansStyle.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium
+                                        ?.fontSize,
+                                  ),
+                                  overflow: TextOverflow.visible,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

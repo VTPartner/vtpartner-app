@@ -29,7 +29,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen>
     // TODO: implement initState
     super.initState();
 
-    tabController = TabController(length: 4, vsync: this);
+    tabController = TabController(length: 3, vsync: this);
   }
 
   double searchLocationContainerHeight = 220.0;
@@ -43,7 +43,7 @@ class _CustomerMainScreenState extends State<CustomerMainScreen>
           children: const [
             HomeScreenTabPage(),
             RidesScreenTabPage(),
-            RewardsScreenTabPage(),
+            // RewardsScreenTabPage(),
             SettingsScreenTabPage()
           ]),
       bottomNavigationBar: BottomNavigationBar(
@@ -52,8 +52,8 @@ class _CustomerMainScreenState extends State<CustomerMainScreen>
               icon: Icon(Icons.home_rounded), label: "Home"),
           BottomNavigationBarItem(
               icon: Icon(Icons.access_time_rounded), label: "Rides"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.attach_money_outlined), label: "Rewards"),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.attach_money_outlined), label: "Rewards"),
           BottomNavigationBarItem(
               icon: Icon(Icons.settings), label: "Settings"),
         ],

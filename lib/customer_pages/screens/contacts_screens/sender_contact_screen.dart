@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
+import 'package:vt_partner/main.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 
@@ -18,11 +20,54 @@ class _SenderContactScreenState extends State<SenderContactScreen> {
   List<Contact>? _contacts; // List of contacts
   List<Contact>? _filteredContacts; // List to store filtered contacts
   String _searchTerm = ''; // Holds the search term
+  String senderName = ''; // Holds the search term
+  String senderNumber = ''; // Holds the search term
+  String customerNumber = ''; // Holds the search term
+
+  setSenderDetailsToMyDetails() async {
+    final pref = await SharedPreferences.getInstance();
+    var customer_name = pref.getString("customer_name");
+    var customer_mobile_no = pref.getString("mobile_no");
+
+    if (customer_name != null && customer_mobile_no != null) {
+      AssistantMethods.saveSenderContactDetails(
+          customer_name, customer_mobile_no, context);
+    } else {
+      MyApp.restartApp(context);
+    }
+  }
+
+  getSenderDetails() async {
+    final pref = await SharedPreferences.getInstance();
+    var sender_name = pref.getString("sender_name");
+    var sender_number = pref.getString("sender_number");
+    var customer_name = pref.getString("customer_name");
+    var customer_mobile_no = pref.getString("mobile_no");
+    print("sender_number::$sender_number");
+    print("customer_mobile_no::$customer_mobile_no");
+    if (customer_mobile_no != null && customer_mobile_no!.isNotEmpty) {
+      customerNumber = customer_mobile_no;
+    }
+    if (sender_name == null || sender_name.isEmpty) {
+      senderName = customer_name.toString().split(" ")[0];
+    } else {
+      senderName = sender_name;
+    }
+
+    if (sender_number == null || sender_number.isEmpty) {
+      senderNumber = customer_mobile_no!;
+    } else {
+      senderNumber = sender_number;
+    }
+    setState(() {});
+  }
+
 
   @override
   void initState() {
     super.initState();
     _loadContacts();
+    getSenderDetails();
   }
 
   // Function to load contacts
@@ -139,7 +184,7 @@ class _SenderContactScreenState extends State<SenderContactScreen> {
                 ),
               ),
               subtitle: Text(
-                '8296565587',
+                '${customerNumber}',
                 style: nunitoSansStyle.copyWith(
                   color: Colors.grey,
                   fontSize: 14.0,
@@ -159,6 +204,7 @@ class _SenderContactScreenState extends State<SenderContactScreen> {
                 //   phoneNumber,
                 //   context,
                 // );
+                setSenderDetailsToMyDetails();
                 Navigator.pop(context);
               },
             )),

@@ -11,15 +11,22 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
+import 'package:vt_partner/delivery_agent_pages/helpers/settings_menu_agent.dart';
 import 'package:vt_partner/global/global.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
 import 'package:vt_partner/main.dart';
+import 'package:vt_partner/push_notifications/get_service_key.dart';
+import 'package:vt_partner/push_notifications/notification_service.dart';
+import 'package:vt_partner/push_notifications/push_notification_system.dart';
 import 'package:vt_partner/routings/route_names.dart';
+import 'package:vt_partner/services/notification_service.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/global/global.dart' as glb;
 import 'package:http/http.dart' as http;
+import 'package:vt_partner/widgets/shimmer_card.dart';
 
 class AgentHomeScreen extends StatefulWidget {
   const AgentHomeScreen({super.key});
@@ -34,6 +41,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
 
   GoogleMapController? newGoogleMapController;
 //15.892953, 74.518013
+bool isLoading = true;
   static const CameraPosition _kGooglePlex = CameraPosition(
     target: LatLng(15.892953, 74.518013),
     zoom: 14.4746,
@@ -227,8 +235,10 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
     CameraPosition cameraPosition =
         CameraPosition(target: latLngPosition, zoom: 14);
 
+    if (newGoogleMapController != null) {
     newGoogleMapController!
         .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
+    }
 
     // Add custom marker at the user's current location
     Marker userMarker = Marker(
@@ -262,7 +272,9 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
   bool isVerified = false;
   String driverName = "", verifiedStatus = "";
   Future<void> statusCheckAsync() async {
+    
     final pref = await SharedPreferences.getInstance();
+    
     pref.setString("recent_online_pic", "");
     var goods_driver_id = pref.getString("goods_driver_id");
 
@@ -329,8 +341,12 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
       if (e.toString().contains("No Data Found")) {
         glb.showToast("No Data Found.");
       } else {
-        glb.showToast("An error occurred: ${e.toString()}");
+        //glb.showToast("An error occurred: ${e.toString()}");
       }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -394,12 +410,100 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
       });
     }
   }
+  NotificationService notificationService = NotificationService();
 
+  Future<void> getNotificationToken() async {
+    notificationService.requestNotificationPermission();
+    notificationService.getGoodsDriverDeviceToken();
+    notificationService.isGoodsDriverTokenRefreshed();
+    notificationService.firebaseInit(context);
+    notificationService.setupInteractMessage(context);
+    final pref = await SharedPreferences.getInstance();
+    pref.setBool("openDriver", true);
+    pref.setBool("openCustomer", false);
+    GetServerKey getServerKey = GetServerKey();
+    String accessToken = await getServerKey.getServerKeyToken();
+    print("serverKeyToken::$accessToken");
+    pref.setString("serverKey", accessToken);
+    pref.setString("goods_drive_device_token", "");
+    var device_token = pref.getString("goods_drive_device_token");
+    if (device_token == null || device_token.isEmpty) {
+      await notificationService.getGoodsDriverDeviceToken();
+      updateDriverAuthToken();
+    }
+    // if (device_token != null && device_token.isNotEmpty) {
+    //   SendNotificationService.sendNotificationUsingApi(
+    //       token: device_token,
+    //       title: 'New Ride Request',
+    //       body: 'Pickup Location: New Vaibhav Nagar',
+    //       data: {'intent': 'driver', 'booking_id': '1'});
+    // }
+
+    //FcmService.firebaseInit();
+  }
+
+  Future<void> updateDriverAuthToken() async {
+    print("updating goods driver authToken");
+    final pref = await SharedPreferences.getInstance();
+
+    final appInfo = Provider.of<AppInfo>(context, listen: false);
+    var latitude = appInfo.userCurrentLocation?.locationLatitude;
+    var longitude = appInfo.userCurrentLocation?.locationLongitude;
+    var full_address = appInfo.userCurrentLocation?.locationName;
+    var pincode = appInfo.userCurrentLocation?.pinCode;
+    if (full_address == null) {
+      MyApp.restartApp(context);
+    }
+    GetServerKey getServerKey = GetServerKey();
+    String accessToken = await getServerKey.getServerKeyToken();
+    var deviceToken = pref.getString("goods_drive_device_token");
+    var goods_driver_id = pref.getString("goods_driver_id");
+    if (deviceToken == null || deviceToken.isEmpty) {
+      var token = await notificationService.getGoodsDriverDeviceToken();
+      pref.setString("goods_drive_device_token", token);
+      updateDriverAuthToken();
+      return;
+    }
+    final data = {'goods_driver_id': goods_driver_id, 'authToken': deviceToken};
+
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/update_firebase_goods_driver_token', data);
+      if (kDebugMode) {
+        print(response);
+      }
+      // Check if the response contains 'results' key and parse it
+      if (response['message'] != null) {}
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+
+      //glb.showToast("An error occurred: ${e.toString()}");
+    }
+  }
+
+  Future<void> _handleRefresh() async {
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      streamSubscriptionPosition?.cancel();
+      // MyApp.restartApp(context);
+    });
+    getNotificationToken();
+    _setupCameraController();
+    setCustomMarkerIcon();
+    checkIfLocationPermissionAllowed();
+    statusCheckAsync();
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      streamSubscriptionPosition?.cancel();
+      // MyApp.restartApp(context);
+    });
+    getNotificationToken();
     _setupCameraController();
     setCustomMarkerIcon();
     checkIfLocationPermissionAllowed();
@@ -411,8 +515,10 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
   @override
   void dispose() async {
     // Cancel the position stream subscription
-    
+    if (newGoogleMapController != null) {
     newGoogleMapController?.dispose();
+    }
+    
     
     super.dispose();
   }
@@ -474,7 +580,22 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
     return Scaffold(
-      body: Column(
+  
+      
+      body: isLoading
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Shimmer.fromColors(
+                  baseColor: Colors.grey.withOpacity(0.2),
+                  highlightColor: Colors.grey.withOpacity(0.1),
+                  enabled: isLoading,
+                  child: const VTPartnerLoader(),
+                ),
+              ],
+            )
+          : Column(
         children: [
           Stack(
             children: [
@@ -528,6 +649,7 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
                               IconButton(
                                 onPressed: () {
                                   //Show Drawer screen here
+                                        // Scaffold.of(context).openDrawer();
                                   Navigator.pushNamed(
                                       context, AgentSettingsRoute);
                                 },
@@ -707,42 +829,101 @@ class _AgentHomeScreenState extends State<AgentHomeScreen> {
     //And he is searching for a new ride . But first check his current status in backend
   }
 
-  updateDriversLocationAtRealTime() {
-    
-    streamSubscriptionPosition =
-        Geolocator.getPositionStream().listen((Position position) {
-      
-      driverCurrentPosition = position;
-      if (isOnline == true) {
-        // Geofire.setLocation(driverID, driverCurrentPosition!.latitude,
-        //     driverCurrentPosition!.longitude); // this is used for firebase realtime database
-        // Update in table also
-      }
+  // updateDriversLocationAtRealTime() {
+  //   LatLng? oldLatLng;
+  //   print("isOnline::$isOnline");
+  //   if (isOnline == false) {
+  //     Future.delayed(const Duration(milliseconds: 1000), () {
+  //       streamSubscriptionPosition?.cancel();
+  //       // MyApp.restartApp(context);
+  //     });
+  //     return;
+  //   }
+  //   streamSubscriptionPosition =
+  //       Geolocator.getPositionStream().listen((Position position) {
 
-      LatLng latLng = LatLng(
-          driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
-      var latitude = driverCurrentPosition!.latitude;
-      var longitude = driverCurrentPosition!.longitude;
-      print("driver cur_lat::$latitude");
-      print("driver cur_lng::$longitude");
-      Future.delayed(const Duration(milliseconds: 2000), () {
-        updateDriversCurrentPosition(latitude, longitude);
+  //     driverCurrentPosition = position;
+  //     if (isOnline == true) {
+  //       // Geofire.setLocation(driverID, driverCurrentPosition!.latitude,
+  //       //     driverCurrentPosition!.longitude); // this is used for firebase realtime database
+  //       // Update in table also
+  //     }
+
+  //     LatLng latLng = LatLng(
+  //         driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
+  //     var latitude = driverCurrentPosition!.latitude;
+  //     var longitude = driverCurrentPosition!.longitude;
+  //     print("driver cur_lat::$latitude");
+  //     print("driver cur_lng::$longitude");
+  //     if (isOnline == true) {
+  //     Future.delayed(const Duration(milliseconds: 2000), () {
+  //       updateDriversCurrentPosition(latitude, longitude);
+  //       // MyApp.restartApp(context);
+  //     });
+  //     }
+  //     //setState(() {
+  //     // print("isOnline::$isOnline");
+  //     if (isOnline == false) {
+  //       updateDriverStatusAsync(latitude, longitude);
+  //     }
+  //     //});
+
+  //     if (newGoogleMapController != null) {
+  //       newGoogleMapController?.animateCamera(CameraUpdate.newLatLng(latLng));
+  //     }
+
+  //   });
+
+  // }
+
+  updateDriversLocationAtRealTime() {
+    LatLng? oldLatLng; // Initialize to track the previous position
+
+    print("isOnline::$isOnline");
+    if (!isOnline) {
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        streamSubscriptionPosition?.cancel();
         // MyApp.restartApp(context);
       });
+      return;
+    }
 
-      //setState(() {
-      // print("isOnline::$isOnline");
-      if (isOnline == false) {
-        updateDriverStatusAsync(latitude, longitude);
-      }
-      //});
+    streamSubscriptionPosition =
+        Geolocator.getPositionStream().listen((Position position) {
+      driverCurrentPosition = position;
 
-      if (newGoogleMapController != null) {
-        newGoogleMapController!.animateCamera(CameraUpdate.newLatLng(latLng));
+      if (isOnline) {
+      LatLng latLng = LatLng(
+          driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
+
+        // Only proceed if the location has changed
+        if (oldLatLng == null ||
+            oldLatLng!.latitude != latLng.latitude ||
+            oldLatLng!.longitude != latLng.longitude) {
+          oldLatLng = latLng;
+
+          // Update in table
+          Future.delayed(const Duration(milliseconds: 2000), () {
+            updateDriversCurrentPosition(driverCurrentPosition!.latitude,
+                driverCurrentPosition!.longitude);
+          });
+
+          // Update the map camera
+          if (newGoogleMapController != null) {
+            newGoogleMapController
+                ?.animateCamera(CameraUpdate.newLatLng(latLng));
+          }
+        }
       }
-      
+
+      // If the driver goes offline, update the status
+      if (!isOnline) {
+        updateDriverStatusAsync(
+            driverCurrentPosition!.latitude, driverCurrentPosition!.longitude);
+      }
     });
   }
+
 
 updateDriversCurrentPosition(var latitude, var longitude) async {
     final pref = await SharedPreferences.getInstance();
@@ -776,22 +957,25 @@ updateDriversCurrentPosition(var latitude, var longitude) async {
       if (kDebugMode) {
         print(e);
       }
-      // glb.showToast("An error occurred: ${e.toString()}");
-      glb.showToast("Something went wrong");
+      // //glb.showToast("An error occurred: ${e.toString()}");
+      //glb.showToast("Something went wrong");
     }
   }
 
   driverIsOfflineNow() async {
     final pref = await SharedPreferences.getInstance();
+    
+    var current_booking_id = pref.getString("current_booking_id_assigned");
+    if (current_booking_id != null && current_booking_id.isNotEmpty) {
+      glb.showToast("You cant go Offline during live order");
+      return;
+    }
     pref.setString("recent_online_pic", "");
     previousSelfie == null;
     deleteFromActiveDriverTableAsync();
     
     //Async to make him go offline
-    Future.delayed(const Duration(milliseconds: 2000), () {
-      streamSubscriptionPosition?.cancel();
-      // MyApp.restartApp(context);
-    });
+  
   }
 
   void _showCameraPreviewDialog(String type) {
@@ -866,7 +1050,7 @@ updateDriversCurrentPosition(var latitude, var longitude) async {
       if (kDebugMode) {
         print(e);
       }
-      // glb.showToast("An error occurred: ${e.toString()}");
+      // //glb.showToast("An error occurred: ${e.toString()}");
       glb.showToast("Something went wrong");
     }
   }
@@ -899,7 +1083,7 @@ updateDriversCurrentPosition(var latitude, var longitude) async {
       if (kDebugMode) {
         print(e);
       }
-      // glb.showToast("An error occurred: ${e.toString()}");
+      // //glb.showToast("An error occurred: ${e.toString()}");
       glb.showToast("Something went wrong");
     }
   }
@@ -921,11 +1105,18 @@ updateDriversCurrentPosition(var latitude, var longitude) async {
         print(response);
       }
       glb.showToast("You are offline now");
+      setState(() {
+        isOnline = false;
+      });
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        streamSubscriptionPosition?.cancel();
+        // MyApp.restartApp(context);
+      });
     } catch (e) {
       if (kDebugMode) {
         print(e);
       }
-      // glb.showToast("An error occurred: ${e.toString()}");
+      // //glb.showToast("An error occurred: ${e.toString()}");
       glb.showToast("Something went wrong");
     }
   }

@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 
 import '../../../routings/route_names.dart';
@@ -43,6 +45,29 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
     CountryCode(code: '+91', flag: '🇮🇳'), // India
     // CountryCode(code: '+971', flag: '🇸🇩'), // UAE
   ];
+  Future<void> _getUserLocationAndAddress() async {
+    print("obtain address");
+    try {
+      Position position = await getUserCurrentLocation();
+      String humanReadableAddress =
+          await AssistantMethods.searchAddressForGeographicCoOrdinates(
+              position!, context, false);
+      print("MyHomeLocation::" + humanReadableAddress);
+    } catch (e) {}
+  }
+
+  Future<Position> getUserCurrentLocation() async {
+    await Geolocator.requestPermission()
+        .then((value) {})
+        .onError((error, stackTrace) {
+      print("Error:::" + error.toString());
+    });
+
+    return await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+  }
+
   bool _isButtonVisible = false;
   bool _isErrorVisible = false;
   final FocusNode _focusNode = FocusNode();
@@ -62,6 +87,7 @@ class _CustomerLoginScreenState extends State<CustomerLoginScreen> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _getUserLocationAndAddress();
     _mobileController.addListener(() {
       setState(() {
         _isButtonVisible = _mobileController.text.isNotEmpty;

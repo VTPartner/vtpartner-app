@@ -83,6 +83,7 @@ class _SwipeToBookButtonState extends State<SwipeToBookButton>
                       fontSize:
                           Theme.of(context).textTheme.bodyMedium?.fontSize,
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
@@ -122,7 +123,7 @@ class _SwipeToBookButtonState extends State<SwipeToBookButton>
                 },
                 child: AnimatedContainer(
                   duration: Duration(milliseconds: 300),
-                  width: 80,
+                  width: 60,
                   height: 60,
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.8),

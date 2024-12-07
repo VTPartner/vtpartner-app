@@ -1,8 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:vt_partner/assistants/assistant_methods.dart';
+import 'package:vt_partner/assistants/request_assistance.dart';
+import 'package:vt_partner/customer_pages/models/all_goods_types_model.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/utils/app_styles.dart';
 import 'package:vt_partner/widgets/heading_text.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
 class GoodsTypeScreen extends StatefulWidget {
   const GoodsTypeScreen({super.key});
@@ -13,6 +17,54 @@ class GoodsTypeScreen extends StatefulWidget {
 
 class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
   int selectedIndex = 0;
+  List<AllGoodsTypesModel> allGoodsTypeModel = [];
+  bool isLoading = false;
+
+  Future<void> fetchAllGoodsTypes() async {
+    final pref = setState(() {
+      isLoading = true;
+      allGoodsTypeModel = [];
+    });
+
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/get_all_goods_types', {});
+      if (kDebugMode) {
+        // print(response);
+      }
+      // Check if the response contains 'results' key and parse it
+      if (response['results'] != null) {
+        List<dynamic> guideLineData = response['results'];
+        // Map the list of service data into a list of Service objects
+        setState(() {
+          allGoodsTypeModel = guideLineData
+              .map(
+                  (guideLineJson) => AllGoodsTypesModel.fromJson(guideLineJson))
+              .toList();
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      if (e.toString().contains("No Data Found")) {
+        glb.showToast("No Guidelines Found.");
+      } else {
+        //glb.showToast("An error occurred: ${e.toString()}");
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllGoodsTypes();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +119,7 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
                       endIndent: 5, // Thickness of the separator line
                     );
                   },
-                  itemCount: 20,
+                  itemCount: allGoodsTypeModel.length,
                   itemBuilder: (context, index) {
                     return InkWell(
                       onTap: () {
@@ -75,6 +127,7 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
                           selectedIndex =
                               index; // Update the selected index on tap.
                         });
+
                       },
                       child: Ink(
                         child: Padding(
@@ -86,21 +139,21 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "Plywood / Timber / Sandal Wood",
+                                    allGoodsTypeModel[index].goodsTypeName,
                                     style: nunitoSansStyle.copyWith(
                                         color: selectedIndex == index
                                             ? ThemeClass.facebookBlue
                                             : Colors.black,
                                         fontSize: 14.0),
                                   ),
-                                  selectedIndex == index
-                                      ? Text(
-                                          "Quantity: Loose",
-                                          style: nunitoSansStyle.copyWith(
-                                              color: Colors.grey,
-                                              fontSize: 12.0),
-                                        )
-                                      : SizedBox()
+                                  // selectedIndex == index
+                                  //     ? Text(
+                                  //         "Quantity: Loose",
+                                  //         style: nunitoSansStyle.copyWith(
+                                  //             color: Colors.grey,
+                                  //             fontSize: 12.0),
+                                  //       )
+                                  //     : SizedBox()
                                 ],
                               ),
                               selectedIndex == index
@@ -147,6 +200,12 @@ class _GoodsTypeScreenState extends State<GoodsTypeScreen> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
+                    var goodsTypeID =
+                        allGoodsTypeModel[selectedIndex].goodsTypeId;
+                    var goodsTypeName =
+                        allGoodsTypeModel[selectedIndex].goodsTypeName;
+                    AssistantMethods.saveGoodsTypeDetails(
+                        goodsTypeID, goodsTypeName, context);
                     Navigator.pop(context);
                   },
                   child: Ink(

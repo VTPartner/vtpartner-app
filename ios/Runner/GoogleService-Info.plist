@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>1046135317601-vejhevh6sps94od27r46s2au23qbgh0f.apps.googleusercontent.com</string>
+	<string>590399228771-5epr00b1g0qiaq34276qduojr6i96aig.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.1046135317601-vejhevh6sps94od27r46s2au23qbgh0f</string>
+	<string>com.googleusercontent.apps.590399228771-5epr00b1g0qiaq34276qduojr6i96aig</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCnEirUWD0_YdJP5fRLxCuziihTZ-62G4U</string>
+	<string>AIzaSyAlwkhT4NPbMt-fwSEYui_mUDL8QlMfB28</string>
 	<key>GCM_SENDER_ID</key>
-	<string>1046135317601</string>
+	<string>590399228771</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.vtpartnertranspvtltd.vtPartner</string>
 	<key>PROJECT_ID</key>
-	<string>vt-partner-4a2b1</string>
+	<string>vt-partner-8317b</string>
 	<key>STORAGE_BUCKET</key>
-	<string>vt-partner-4a2b1.firebasestorage.app</string>
+	<string>vt-partner-8317b.firebasestorage.app</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,6 +29,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:1046135317601:ios:1767e1e8cdf73effe07620</string>
+	<string>1:590399228771:ios:baa1ce7a4246e2a05fe156</string>
 </dict>
 </plist>

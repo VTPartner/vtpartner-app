@@ -1,6 +1,10 @@
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
+import 'package:vt_partner/customer_pages/models/active_booking_model.dart';
+import 'package:vt_partner/global/global.dart';
+
 import 'package:vt_partner/global/map_key.dart';
 import 'package:vt_partner/infoHandler/app_info.dart';
 import 'package:vt_partner/models/contact_model.dart';
@@ -8,10 +12,11 @@ import 'package:vt_partner/models/direction_details_info.dart';
 import 'package:vt_partner/models/directions.dart';
 import 'package:provider/provider.dart';
 import 'package:vt_partner/models/pickup_location_map_direction.dart';
+import 'package:vt_partner/customer_pages/models/goods_type_model.dart';
 
 class AssistantMethods {
   static Future<String> searchAddressForGeographicCoOrdinates(
-      Position position, context) async {
+      Position position, context, bool saveAsPickup) async {
     String humanReadableAddress = "", postalCode = "";
     String apiUrl =
         "https://maps.googleapis.com/maps/api/geocode/json?latlng=${position.latitude},${position.longitude}&key=$mapKey";
@@ -31,11 +36,15 @@ class AssistantMethods {
       userPickUpAddress.locationLongitude = position.longitude;
       userPickUpAddress.pinCode = postalCode;
       userPickUpAddress.locationName = humanReadableAddress;
-
-      Provider.of<AppInfo>(context, listen: false)
+      if (saveAsPickup == true) {
+        Provider.of<AppInfo>(context, listen: false)
           .updateCustomerCurrentLocationAddress(userPickUpAddress);
+      } else {
+        Provider.of<AppInfo>(context, listen: false)
+            .updateCustomerCurrentLocationAddress(userPickUpAddress);
+      }
     } else {
-      searchAddressForGeographicCoOrdinates(position, context);
+      searchAddressForGeographicCoOrdinates(position, context, saveAsPickup);
     }
     return humanReadableAddress;
   }
@@ -103,24 +112,32 @@ class AssistantMethods {
   }
 
   static saveSenderContactDetails(
-      String contactName, String contactNumber, context) {
+      String contactName, String contactNumber, context) async {
+    final pref = await SharedPreferences.getInstance();
     if (contactName.isNotEmpty && contactNumber.isNotEmpty) {
       ContactModel senderContactDetails = ContactModel();
       senderContactDetails.contactName = contactName;
       senderContactDetails.contactNumber = contactNumber;
 
+      pref.setString("sender_name", contactName);
+      pref.setString("sender_number", contactNumber);
       Provider.of<AppInfo>(context, listen: false)
           .updateSenderContactDetails(senderContactDetails);
+    } else {
+      pref.setString("sender_name", "");
+      pref.setString("sender_number", "");
     }
   }
 
   static saveReceiverContactDetails(
-      String contactName, String contactNumber, context) {
+      String contactName, String contactNumber, context) async {
     if (contactName.isNotEmpty && contactNumber.isNotEmpty) {
       ContactModel receiverContactDetails = ContactModel();
       receiverContactDetails.contactName = contactName;
       receiverContactDetails.contactNumber = contactNumber;
-
+      final pref = await SharedPreferences.getInstance();
+      pref.setString("receiver_name", contactName);
+      pref.setString("receiver_number", contactNumber);
       Provider.of<AppInfo>(context, listen: false)
           .updateReceiverContactDetails(receiverContactDetails);
     }
@@ -153,4 +170,59 @@ class AssistantMethods {
 
     return directionDetailsInfo;
   }
+
+  static saveBookingDetails(
+      int? driverID,
+      int? vehicleID,
+      String vehicleImage,
+      String vehicleName,
+      String vehicleWeight,
+      String estimatedTotalTime,
+      double estimatedTotalDistance,
+      double totalPrice,
+      double basePrice,
+      context) {
+    if (vehicleID != null) {
+      ActiveBookingModel bookingDetails = ActiveBookingModel();
+      bookingDetails.driverID = driverID;
+      bookingDetails.vehicleID = vehicleID;
+      bookingDetails.vehicleImage = vehicleImage;
+      bookingDetails.vehicleName = vehicleName;
+      bookingDetails.vehicleWeight = vehicleWeight;
+      bookingDetails.estimatedTotalTime = estimatedTotalTime;
+      bookingDetails.estimatedTotalDistance = estimatedTotalDistance;
+      bookingDetails.totalPrice = totalPrice;
+      bookingDetails.basePrice = basePrice;
+
+      Provider.of<AppInfo>(context, listen: false)
+          .updateBookingDetails(bookingDetails);
+    }
+  }
+
+  static saveGoodsTypeDetails(int? goodsTypeID, String goodsTypeName, context) {
+    if (goodsTypeID != null) {
+      GoodsTypesModel goodsTypeDetails = GoodsTypesModel();
+      goodsTypeDetails.goodsTypeID = goodsTypeID;
+      goodsTypeDetails.goodsTypeName = goodsTypeName;
+
+      Provider.of<AppInfo>(context, listen: false)
+          .updateGoodsTypeDetails(goodsTypeDetails);
+    }
+  }
+
+  static pauseLiveLocationUpdates() {
+    streamSubscriptionPosition!.pause();
+    //Geofire.removeLocation(currentFirebaseUser!.uid);
+  }
+
+  static resumeLiveLocationUpdates() {
+    streamSubscriptionPosition!.resume();
+    // Geofire.setLocation(
+    //     currentFirebaseUser!.uid,
+    //     driverCurrentPosition!.latitude,
+    //     driverCurrentPosition!.longitude
+    // );
+  }
+
+
 }

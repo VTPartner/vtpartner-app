@@ -287,72 +287,75 @@ class _SettingsScreenTabPageState extends State<SettingsScreenTabPage> {
                 SizedBox(
                   height: 10,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16.0)),
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              top: 12.0, bottom: 12.0, right: 8.0),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 5,
-                                height: 40,
-                                decoration: const BoxDecoration(
-                                    color: ThemeClass.facebookBlue,
-                                    borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(16.0),
-                                        bottomRight: Radius.circular(16.0))),
-                              ),
-                              SizedBox(
-                                width: kHeight,
-                              ),
-                              Text(
-                                "More",
-                                style: nunitoSansStyle.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 18.0),
-                                overflow: TextOverflow.ellipsis,
-                              )
-                            ],
+                Visibility(
+                  visible: false,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16.0)),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 12.0, bottom: 12.0, right: 8.0),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 5,
+                                  height: 40,
+                                  decoration: const BoxDecoration(
+                                      color: ThemeClass.facebookBlue,
+                                      borderRadius: BorderRadius.only(
+                                          topRight: Radius.circular(16.0),
+                                          bottomRight: Radius.circular(16.0))),
+                                ),
+                                SizedBox(
+                                  width: kHeight,
+                                ),
+                                Text(
+                                  "More",
+                                  style: nunitoSansStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                      fontSize: 18.0),
+                                  overflow: TextOverflow.ellipsis,
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        SettingsMenuItems(
-                            icon: Icons.manage_accounts_outlined,
-                            title: 'Account Settings',
-                            onTap: () {}),
-                        Divider(
-                          color: Colors.grey,
-                          thickness: 0.1,
-                          indent: 70,
-                          endIndent: 20,
-                        ),
-                        SettingsMenuItems(
-                            icon: Icons.bookmark_outline,
-                            title: 'Saved Addresses',
-                            onTap: () {}),
-                        Divider(
-                          color: Colors.grey,
-                          thickness: 0.1,
-                          indent: 70,
-                          endIndent: 20,
-                        ),
-                        SettingsMenuWithIconItems(
-                            icon: Icons.contact_page_outlined,
-                            title: "Refer your friends",
-                            onTap: () {},
-                            buttonIcon: Icons.share,
-                            buttonText: "Invite"),
-                        SizedBox(
-                          height: kHeight,
-                        )
-                      ],
+                          SettingsMenuItems(
+                              icon: Icons.manage_accounts_outlined,
+                              title: 'Account Settings',
+                              onTap: () {}),
+                          Divider(
+                            color: Colors.grey,
+                            thickness: 0.1,
+                            indent: 70,
+                            endIndent: 20,
+                          ),
+                          SettingsMenuItems(
+                              icon: Icons.bookmark_outline,
+                              title: 'Saved Addresses',
+                              onTap: () {}),
+                          Divider(
+                            color: Colors.grey,
+                            thickness: 0.1,
+                            indent: 70,
+                            endIndent: 20,
+                          ),
+                          SettingsMenuWithIconItems(
+                              icon: Icons.contact_page_outlined,
+                              title: "Refer your friends",
+                              onTap: () {},
+                              buttonIcon: Icons.share,
+                              buttonText: "Invite"),
+                          SizedBox(
+                            height: kHeight,
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),

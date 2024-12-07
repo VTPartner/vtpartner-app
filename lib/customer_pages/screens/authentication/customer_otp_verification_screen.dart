@@ -91,7 +91,7 @@ class _CustomerOTPVerificationScreenState
         glb.showToast("No Data Found.");
       } else {
         glb.showToast("Something went wrong");
-        // glb.showToast("An error occurred: ${e.toString()}");
+        // //glb.showToast("An error occurred: ${e.toString()}");
       }
     }
   }
