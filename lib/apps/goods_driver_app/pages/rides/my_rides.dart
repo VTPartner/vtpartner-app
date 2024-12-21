@@ -1,42 +1,82 @@
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vt_partner/assistants/request_assistance.dart';
+import 'package:vt_partner/customer_pages/models/all_orders_model.dart';
+import 'package:vt_partner/infoHandler/app_info.dart';
+import 'package:vt_partner/main.dart';
+import 'package:vt_partner/routings/route_names.dart';
 
 import 'package:vt_partner/themes/themes.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
-class MyRideScreen extends StatefulWidget {
-  const MyRideScreen({super.key});
+class GoodsDriverRideScreen extends StatefulWidget {
+  const GoodsDriverRideScreen({super.key});
 
   @override
-  State<MyRideScreen> createState() => _MyRideScreenState();
+  State<GoodsDriverRideScreen> createState() => _GoodsDriverRideScreenState();
 }
 
-class _MyRideScreenState extends State<MyRideScreen> {
-  final myRidesList = [
-    {
-      "image": "assets/editProfile/user.png",
-      "name": "Tynisha Obey",
-      "price": "\$30.50",
-      "time": "Today 01:17 pm",
-      "pickAddress": "9 Bailey Drive, Fredericton, NB E3B 5A3",
-      "dropAddress": "1655 Island Pkwy, Kamloops, BC V2B 6Y9"
-    },
-    {
-      "image": "assets/editProfile/user.png",
-      "name": "Leslie Alexander",
-      "price": "\$25.50",
-      "time": "Fri 05 Jun, 2020 06:31 am",
-      "pickAddress": "38 Whiteshell Avenue, Winnipeg, MB R2C",
-      "dropAddress": "225 Belleville St, Victoria, BC V8V 1X1"
-    },
-    {
-      "image": "assets/editProfile/user.png",
-      "name": "Esther Howard",
-      "price": "\$35.500",
-      "time": "Thu 04 Jun, 2020 07:00 am",
-      "pickAddress": "6387 Arad Street, Niagara Falls, ON L2G 2Z7",
-      "dropAddress": "225 Belleville St, Victoria, BC V8V 1X1"
+class _GoodsDriverRideScreenState extends State<GoodsDriverRideScreen> {
+  bool isLoading = true, noOrdersFound = true;
+  List<AllOrdersModel> allOrdersModel = [];
+
+  Future<void> fetchAllOrders() async {
+    final pref = await SharedPreferences.getInstance();
+    var goods_driver_id = pref.getString("goods_driver_id");
+    final data = {
+      'driver_id': goods_driver_id,
+    };
+
+    setState(() {
+      isLoading = true;
+      allOrdersModel = [];
+    });
+
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/goods_driver_all_orders', data);
+      if (kDebugMode) {
+        print(response);
+      }
+      // Check if the response contains 'results' key and parse it
+      if (response['results'] != null) {
+        List<dynamic> ordersData = response['results'];
+        // Map the list of service data into a list of Service objects
+        setState(() {
+          allOrdersModel = ordersData
+              .map((serviceJson) => AllOrdersModel.fromJson(serviceJson))
+              .toList();
+          noOrdersFound = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      if (e.toString().contains("No Data Found")) {
+        // glb.showToast("No Orders History Found.");
+        setState(() {
+          noOrdersFound = true;
+        });
+      } else {
+        //glb.showToast("An error occurred: ${e.toString()}");
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
-  ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -67,11 +107,11 @@ class _MyRideScreenState extends State<MyRideScreen> {
       padding: const EdgeInsets.symmetric(
           vertical: fixPadding, horizontal: fixPadding * 2.0),
       physics: const BouncingScrollPhysics(),
-      itemCount: myRidesList.length,
+      itemCount: allOrdersModel.length,
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            Navigator.pushNamed(context, '/rideDetail');
+            // Navigator.pushNamed(context, GoodsDriverRideDetailsRoute);
           },
           child: Container(
             width: double.maxFinite,
@@ -95,7 +135,7 @@ class _MyRideScreenState extends State<MyRideScreen> {
                         shape: BoxShape.circle,
                         image: DecorationImage(
                           image: AssetImage(
-                            myRidesList[index]['image'].toString(),
+                            'assets/images/demo_user.jpg',
                           ),
                           fit: BoxFit.cover,
                         ),
@@ -108,13 +148,14 @@ class _MyRideScreenState extends State<MyRideScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            myRidesList[index]['time'].toString(),
-                            style: semibold16Black,
+                            glb.formatEpochToDateTime(double.parse(
+                                allOrdersModel[index].booking_timing!)),
+                            style: semibold14Black,
                             overflow: TextOverflow.ellipsis,
                           ),
                           heightBox(3.0),
                           Text(
-                            myRidesList[index]['name'].toString(),
+                            "${allOrdersModel[index].customer_name!}",
                             style: semibold14Grey,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -122,7 +163,8 @@ class _MyRideScreenState extends State<MyRideScreen> {
                       ),
                     ),
                     Text(
-                      myRidesList[index]['price'].toString(),
+                      
+                      "₹${double.parse(allOrdersModel[index].total_price!).round()}/-",
                       style: bold16Primary,
                     )
                   ],
@@ -141,8 +183,8 @@ class _MyRideScreenState extends State<MyRideScreen> {
                         widthSpace,
                         Expanded(
                           child: Text(
-                            myRidesList[index]['pickAddress'].toString(),
-                            style: semibold15Black,
+                            "${allOrdersModel[index].pickup_address!}",
+                            style: semibold12Black,
                             overflow: TextOverflow.ellipsis,
                           ),
                         )
@@ -185,8 +227,8 @@ class _MyRideScreenState extends State<MyRideScreen> {
                         widthSpace,
                         Expanded(
                           child: Text(
-                            myRidesList[index]['dropAddress'].toString(),
-                            style: semibold15Black,
+                            "${allOrdersModel[index].drop_address!}",
+                            style: semibold12Black,
                             overflow: TextOverflow.ellipsis,
                           ),
                         )

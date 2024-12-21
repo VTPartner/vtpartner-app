@@ -164,7 +164,7 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
       "destination_lng": destination_lng,
       "distance": distance,
       "time": time,
-      "total_price": total_price,
+      "total_price": double.parse(totalPrice.toStringAsFixed(2)).toString(),
       "base_price": base_price,
       "gst_amount": 0,
       "igst_amount": 0,
@@ -651,7 +651,7 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
                                         ],
                                 ),
                                 Text(
-                                        "₹ ${totalPrice}",
+                                        "₹ ${double.parse(totalPrice.toStringAsFixed(2)).toString()}",
                                   style: nunitoSansStyle.copyWith(
                                       color: Colors.black, fontSize: 12.0),
                                 ),
@@ -670,7 +670,7 @@ class _BookingReviewScreenState extends State<BookingReviewScreen> {
                                       nunitoSansStyle.copyWith(fontSize: 12.0),
                                 ),
                                 Text(
-                                        "₹ ${totalPrice}",
+                                        "₹ ${double.parse(totalPrice.toStringAsFixed(2)).toString()}",
                                         style: nunitoSansStyle.copyWith(
                                             color: Colors.grey,
                                             fontWeight: FontWeight.bold,

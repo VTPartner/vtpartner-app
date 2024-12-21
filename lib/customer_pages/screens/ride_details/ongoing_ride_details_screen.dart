@@ -1320,7 +1320,8 @@ class _CustomerOngoingRideDetailsScreenState
                                       color: Colors.grey,
                                       thickness: 0.1,
                                     ),
-                                    Padding(
+                                    ongoingBookingModel.paymentMethod != "NA"
+                                        ? Padding(
                                       padding:
                                           const EdgeInsets.only(bottom: 8.0),
                                       child: Row(
@@ -1358,7 +1359,8 @@ class _CustomerOngoingRideDetailsScreenState
                                           )
                                         ],
                                       ),
-                                    ),
+                                          )
+                                        : SizedBox()
                                   ],
                                 ),
                               ),
@@ -1380,7 +1382,21 @@ class _CustomerOngoingRideDetailsScreenState
                                         color: Colors.transparent,
                                         child: InkWell(
                                           onTap: () {
-                                            asyncCancelBooking();
+                                            // asyncCancelBooking();
+                                            glb.driverImage =
+                                                ongoingBookingModel
+                                                    .driverImage!;
+                                            glb.driverName =
+                                                ongoingBookingModel.driverName!;
+                                            glb.customerId =
+                                                ongoingBookingModel.customerId!;
+                                            glb.driverId =
+                                                ongoingBookingModel.driverId!;
+                                            glb.pickupAddress =
+                                                ongoingBookingModel
+                                                    .pickupAddress!;
+                                            Navigator.pushNamed(
+                                                context, CancelBookingRoute);
                                           },
                                           child: Ink(
                                             decoration: BoxDecoration(

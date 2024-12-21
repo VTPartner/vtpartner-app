@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 import 'package:vt_partner/themes/themes.dart';
 
-class FAQsScreen extends StatefulWidget {
-  const FAQsScreen({super.key});
+class GoodsDriverFAQsScreen extends StatefulWidget {
+  const GoodsDriverFAQsScreen({super.key});
 
   @override
-  State<FAQsScreen> createState() => _FAQsScreenState();
+  State<GoodsDriverFAQsScreen> createState() => _GoodsDriverFAQsScreenState();
 }
 
-class _FAQsScreenState extends State<FAQsScreen> {
+class _GoodsDriverFAQsScreenState extends State<GoodsDriverFAQsScreen> {
   final faqList = [
     {
       "title": "Sign in Issue",
@@ -18,7 +18,7 @@ class _FAQsScreenState extends State<FAQsScreen> {
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit elementum fringilla gravida blandit craseget mauris mauris. Ipsum, iaculis elementum senectus non condimentum id massa eget."
     },
     {
-      "title": "Cab Booking",
+      "title": "Goods Booking",
       "question": "Issue regarding booking a ride.",
       "answer":
           "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed hendrerit elementum fringilla gravida blandit craseget mauris mauris. Ipsum, iaculis elementum senectus non condimentum id massa eget."

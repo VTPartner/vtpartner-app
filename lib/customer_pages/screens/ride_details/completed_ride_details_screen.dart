@@ -10,6 +10,7 @@ import 'package:vt_partner/animation/fade_animation.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/customer_pages/models/completed_order_model.dart';
+import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/widgets/body_text1.dart';
 import 'package:vt_partner/widgets/description_text.dart';
@@ -1661,57 +1662,63 @@ bool isLoading = true;
                         ),
                       ),
                     ),
-                    completedOrderModel.ratings == "0.0"
-                        ? Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                                    onTap: () {
-                                      _showRatingBottomSheet(context);
-                                    },
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Ink(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 36.0, vertical: 12.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6.0),
-                            color:
-                                Colors.yellow[900], // Button background color
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(
-                                "assets/icons/star.png",
-                                width: 20,
-                                height: 20,
-                              ),
-                              SizedBox(
-                                width: 5.0,
-                              ),
-                              Text(
-                                'Rate your ride',
-                                style: robotoStyle.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.white, // Text color
-                                  fontSize: 14.0,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                          )
-                        : SizedBox(),
+                    //     completedOrderModel.ratings == "0.0"
+                    //         ? Container(
+                    // padding:
+                    //     const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                    // child: Column(
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Material(
+                    //       color: Colors.transparent,
+                    //       child: InkWell(
+                    //                     onTap: () {
+                    //                       glb.driverImage =
+                    //                           completedOrderModel.driverImage!;
+                    //                       glb.driverName =
+                    //                           completedOrderModel.driverName!;
+                    //                       //_showRatingBottomSheet(context);
+                    //                       Navigator.pushNamed(context,
+                    //                           GoodsDriverRatingScreenRoute);
+                    //                     },
+                    //         borderRadius: BorderRadius.circular(8.0),
+                    //         child: Ink(
+                    //           padding: const EdgeInsets.symmetric(
+                    //               horizontal: 36.0, vertical: 12.0),
+                    //           decoration: BoxDecoration(
+                    //             borderRadius: BorderRadius.circular(6.0),
+                    //             color:
+                    //                 Colors.yellow[900], // Button background color
+                    //           ),
+                    //           child: Row(
+                    //             mainAxisAlignment: MainAxisAlignment.center,
+                    //             children: [
+                    //               Image.asset(
+                    //                 "assets/icons/star.png",
+                    //                 width: 20,
+                    //                 height: 20,
+                    //               ),
+                    //               SizedBox(
+                    //                 width: 5.0,
+                    //               ),
+                    //               Text(
+                    //                 'Rate your ride',
+                    //                 style: robotoStyle.copyWith(
+                    //                   fontWeight: FontWeight.w700,
+                    //                   color: Colors.white, // Text color
+                    //                   fontSize: 14.0,
+                    //                 ),
+                    //               ),
+                    //             ],
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
+                    //           )
+                    //         : SizedBox(),
               SizedBox(
                 height: kHeight * 10,
               ),
@@ -1728,10 +1735,17 @@ bool isLoading = true;
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Material(
+                completedOrderModel.ratings == "0.0"
+                    ? Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {},
+                          onTap: () {
+                            glb.driverImage = completedOrderModel.driverImage!;
+                            glb.driverName = completedOrderModel.driverName!;
+                            //_showRatingBottomSheet(context);
+                            Navigator.pushNamed(
+                                context, GoodsDriverRatingScreenRoute);
+                          },
                     borderRadius: BorderRadius.circular(8.0),
                     child: Ink(
                       padding: const EdgeInsets.symmetric(
@@ -1745,7 +1759,7 @@ bool isLoading = true;
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            Icons.bookmark_add_outlined,
+                                  Icons.star,
                             color: Colors.white,
                             size: 18,
                           ),
@@ -1753,7 +1767,7 @@ bool isLoading = true;
                             width: 5.0,
                           ),
                           Text(
-                            'Book Again',
+                                  'Rate Ride',
                             style: robotoStyle.copyWith(
                               fontWeight: FontWeight.w700,
                               color: Colors.white, // Text color
@@ -1764,7 +1778,8 @@ bool isLoading = true;
                       ),
                     ),
                   ),
-                ),
+                      )
+                    : SizedBox(),
                 SizedBox(
                   width: kHeight,
                 ),

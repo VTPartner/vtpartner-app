@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
 
 import 'package:vt_partner/themes/themes.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
-class ContactUsScreen extends StatefulWidget {
-  const ContactUsScreen({super.key});
+class GoodsDriverContactUsScreen extends StatefulWidget {
+  const GoodsDriverContactUsScreen({super.key});
 
   @override
-  State<ContactUsScreen> createState() => _ContactUsScreenState();
+  State<GoodsDriverContactUsScreen> createState() =>
+      _GoodsDriverContactUsScreenState();
 }
 
-class _ContactUsScreenState extends State<ContactUsScreen> {
+class _GoodsDriverContactUsScreenState
+    extends State<GoodsDriverContactUsScreen> {
+  TextEditingController emailController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController messageController = TextEditingController();
+      
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -69,7 +76,20 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              var name = nameController.text.toString().trim();
+              var email = emailController.text.toString().trim();
+              var message = messageController.text.toString().trim();
+
+              if (name.isEmpty || email.isEmpty || message.isEmpty) {
+                glb.showSnackBar(context,
+                    "All fields are required to help us serve you better. Thank you!");
+                return;
+              }
+              glb.showSnackBar(context,
+                  "Thank you for reaching out to us. We will get back to you shortly.");
+              Future.delayed(const Duration(seconds: 2), () {
+                Navigator.pop(context);
+              });
             },
             child: Container(
               margin: const EdgeInsets.only(
@@ -96,17 +116,18 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
 
   messageField() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Your Message",
           style: semibold15Grey,
         ),
         TextField(
+          controller: messageController,
           cursorColor: primaryColor,
           style: bold16Black,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your message",
             enabledBorder: UnderlineInputBorder(
@@ -122,18 +143,19 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
 
   emailField() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Email Address",
           style: semibold15Grey,
         ),
         TextField(
+          controller: emailController,
           keyboardType: TextInputType.emailAddress,
           cursorColor: primaryColor,
           style: bold16Black,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your email address",
             enabledBorder: UnderlineInputBorder(
@@ -149,18 +171,19 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
   }
 
   nameField() {
-    return const Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           "Full Name",
           style: semibold15Grey,
         ),
         TextField(
+          controller: nameController,
           keyboardType: TextInputType.name,
           cursorColor: primaryColor,
           style: bold16Black,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             border: InputBorder.none,
             hintText: "Enter your name",
             enabledBorder: UnderlineInputBorder(
@@ -193,7 +216,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         widthSpace,
         Expanded(
           child: Text(
-            "cabwind@gmail.com",
+            "support@vtpartner.in",
             style: semibold16Grey,
           ),
         )
@@ -212,7 +235,7 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
         widthSpace,
         Expanded(
           child: Text(
-            "+91 2365479130",
+            "+91 9665141555",
             style: semibold16Grey,
           ),
         )

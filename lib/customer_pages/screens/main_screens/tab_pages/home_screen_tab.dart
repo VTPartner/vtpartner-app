@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -10,6 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:vt_partner/apps/goods_driver_app/pages/home/home.dart';
 import 'package:vt_partner/assistants/assistant_methods.dart';
 import 'package:vt_partner/assistants/geofire_assistant.dart';
 import 'package:vt_partner/assistants/request_assistance.dart';
@@ -307,6 +309,7 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
   Future<void> _setUserLocationMarker(context) async {
     final pref = await SharedPreferences.getInstance();
     var customer_name = pref?.getString('customer_name');
+    var mobile_no = pref?.getString('mobile_no');
     if (customer_name != null) {
       _customer_name = customer_name.split(' ')[0];
     }
@@ -811,7 +814,6 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
     }
   }
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -830,7 +832,6 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
     _resetLocations();
     //updateDriversLocationAtRealTime();
   }
-
 
   _resetLocations() async {
     final pref = await SharedPreferences.getInstance();
@@ -861,7 +862,7 @@ class _HomeScreenTabPageState extends State<HomeScreenTabPage> {
     super.dispose();
   }
 
-Future<void> _handleRefresh() async {
+  Future<void> _handleRefresh() async {
     getNotificationToken();
     checkServiceAvailable();
     //getOnlineGoodsDrivers();
@@ -874,89 +875,20 @@ Future<void> _handleRefresh() async {
     _setUserLocationMarker(context);
     _resetLocations();
   }
+
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     createActiveNearByDriverIconMarker();
     appInfo = Provider.of<AppInfo>(context);
 
+    final size = MediaQuery.of(context).size;
     double _width = MediaQuery.of(context).size.width;
     double _height = MediaQuery.of(context).size.height;
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: ThemeClass.backgroundColorLightPink,
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: ThemeClass.facebookBlue,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  
-                  CircleAvatar(
-                    radius: 30,
-                    backgroundColor: Colors.white,
-                    child: ClipOval(
-                      child: Image.network(
-                        "https://vtpartner.in/media/image_YoRjcDi.jpg",
-                        fit: BoxFit.cover,
-                        width: 60,
-                        height: 60,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    'Welcome ${_customer_name} 👋',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.location_history),
-              title: Text('Switch As Goods Agent'),
-              onTap: () {
-                navigateToGoodsDriver();
-              },
-            ),
-            // ListTile(
-            //   leading: Icon(Icons.car_repair_rounded),
-            //   title: Text('Switch As Cab Driver'),
-            //   onTap: () {
-            //     // Navigator.pushNamed(context, HistoryScreenRoute);
-            //   },
-            // ),
-            // ListTile(
-            //   leading: Icon(Icons.hail_outlined),
-            //   title: Text('Switch As Driver'),
-            //   onTap: () {
-            //     // Navigator.pushNamed(context, SettingsScreenRoute);
-            //   },
-            // ),
-            // ListTile(
-            //   leading: Icon(Icons.person_pin_circle),
-            //   title: Text('Switch As HandyMan'),
-            //   onTap: () {
-            //     // Navigator.pushNamed(context, SettingsScreenRoute);
-            //   },
-            // ),
-            // ListTile(
-            //   leading: Icon(Icons.logout),
-            //   title: Text('Logout'),
-            //   onTap: () {
-            //     // Add your logout logic here
-            //   },
-            // ),
-          ],
-        ),
-      ),
+      drawer: drawer(size),
       body: isLoading
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -1623,6 +1555,297 @@ Future<void> _handleRefresh() async {
     );
   }
 
+  drawer(Size size) {
+    return Row(
+      children: [
+        Drawer(
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.horizontal(
+              right: Radius.circular(20.0),
+            ),
+          ),
+          width: size.width * 0.75,
+          backgroundColor: whiteColor,
+          child: Column(
+            children: [
+              userInformation(size),
+              drawerItemsList(),
+            ],
+          ),
+        ),
+        closeButton(size),
+      ],
+    );
+  }
+
+  userInformation(Size size) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+          vertical: fixPadding * 5.0, horizontal: fixPadding * 1.5),
+      width: double.maxFinite,
+      decoration: const BoxDecoration(
+        color: primaryColor,
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(20.0),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            height: size.height * 0.09,
+            width: size.height * 0.09,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.bottomLeft,
+                  child: Container(
+                    height: size.height * 0.085,
+                    width: size.height * 0.085,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          "https://vtpartner.org/media/image_YoRjcDi.jpg",
+                        ),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: InkWell(
+                    onTap: () {
+                      // Navigator.pushNamed(context, GoodsDriverEditProfileRoute)
+                      //     .then((value) =>
+                      //         scaffoldKey.currentState?.closeDrawer());
+                    },
+                    child: Container(
+                      height: size.height * 0.038,
+                      width: size.height * 0.038,
+                      decoration: const BoxDecoration(
+                        color: whiteColor,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.border_color_outlined,
+                        size: 15,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          widthSpace,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "${_customer_name}",
+                  style: bold16White,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  closeButton(Size size) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ClipPath(
+          clipper: CustomMenuClipper(),
+          child: Container(
+            width: size.width * 0.22,
+            height: 130,
+            decoration: const BoxDecoration(color: whiteColor),
+            padding: const EdgeInsets.only(left: fixPadding / 3),
+            alignment: Alignment.centerLeft,
+            child: InkWell(
+              onTap: () {
+                if (scaffoldKey.currentState!.isDrawerOpen) {
+                  scaffoldKey.currentState!.closeDrawer();
+                }
+              },
+              child: Container(
+                height: 36,
+                width: 36,
+                decoration: BoxDecoration(
+                  color: whiteColor,
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: greyColor.withOpacity(0.5),
+                      blurRadius: 6,
+                    )
+                  ],
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Icons.close,
+                  size: 16,
+                  color: primaryColor,
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  drawerItemsList() {
+    final size = MediaQuery.of(context).size;
+    return Expanded(
+      child: ListView(
+        padding: const EdgeInsets.all(fixPadding * 1.5),
+        physics: const BouncingScrollPhysics(),
+        children: [
+          drawerItemWidget(CupertinoIcons.car_detailed, "Goods Driver", () {
+            navigateToGoodsDriver();
+          }),
+
+          // drawerItemWidget(
+          //   Icons.person_3,
+          //   "Switch as a Customer",
+          //   () {
+          //     Navigator.pushNamed(context, CustomerMainScreenRoute)
+          //         .then((value) => scaffoldKey.currentState?.closeDrawer());
+          //   },
+          // ),
+        ],
+      ),
+    );
+  }
+
+  divider() {
+    return Container(
+      height: 1,
+      margin: const EdgeInsets.symmetric(vertical: fixPadding / 4),
+      width: double.maxFinite,
+      color: lightGreyColor,
+    );
+  }
+
+  drawerItemWidget(IconData icon, String title, Function() onTap) {
+    return ListTile(
+      onTap: onTap,
+      contentPadding: EdgeInsets.zero,
+      leading: Container(
+        height: 30,
+        width: 30,
+        decoration: BoxDecoration(
+          color: primaryColor,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+                color: primaryColor.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 6))
+          ],
+        ),
+        alignment: Alignment.center,
+        child: Icon(
+          icon,
+          color: whiteColor,
+          size: 16,
+        ),
+      ),
+      minLeadingWidth: 0,
+      title: Text(
+        title,
+        style: bold17Black,
+      ),
+    );
+  }
+
+  logoutDialog() {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          insetPadding: const EdgeInsets.all(fixPadding * 2.0),
+          contentPadding: const EdgeInsets.all(fixPadding * 2.0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Row(
+                children: [
+                  Icon(
+                    CupertinoIcons.question_circle_fill,
+                    color: primaryColor,
+                  ),
+                  widthSpace,
+                  Expanded(
+                    child: Text(
+                      "Do You Want to Logout...?",
+                      style: semibold16Black,
+                    ),
+                  )
+                ],
+              ),
+              heightSpace,
+              heightSpace,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: fixPadding, horizontal: fixPadding * 2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        border: Border.all(color: greyShade3),
+                        color: whiteColor,
+                      ),
+                      child: const Text(
+                        "Cancel",
+                        style: bold16Grey,
+                      ),
+                    ),
+                  ),
+                  widthSpace,
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: fixPadding, horizontal: fixPadding * 2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        boxShadow: buttonShadow,
+                        color: primaryColor,
+                      ),
+                      child: const Text(
+                        "Logout",
+                        style: bold16White,
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
 
   void navigateToGoodsDriver() async {
     final pref = await SharedPreferences.getInstance();
@@ -1637,7 +1860,7 @@ Future<void> _handleRefresh() async {
       //   glb.streamSubscriptionPosition?.cancel();
       //   // MyApp.restartApp(context);
       // });
-      Navigator.pop(context);
+      scaffoldKey.currentState?.closeDrawer();
       Navigator.pushReplacementNamed(context, AgentHomeScreenRoute);
     } else {
       // Future.delayed(const Duration(milliseconds: 100), () {
@@ -1649,4 +1872,84 @@ Future<void> _handleRefresh() async {
     }
     //goods_driver_id,driver_name
   }
+
 }
+
+
+/*
+drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: ThemeClass.facebookBlue,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundColor: Colors.white,
+                    child: ClipOval(
+                      child: Image.network(
+                        "https://vtpartner.org/media/image_YoRjcDi.jpg",
+                        fit: BoxFit.cover,
+                        width: 60,
+                        height: 60,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Text(
+                    'Welcome ${_customer_name} 👋',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: Icon(Icons.location_history),
+              title: Text('Switch As Goods Agent'),
+              onTap: () {
+                navigateToGoodsDriver();
+              },
+            ),
+            // ListTile(
+            //   leading: Icon(Icons.car_repair_rounded),
+            //   title: Text('Switch As Cab Driver'),
+            //   onTap: () {
+            //     // Navigator.pushNamed(context, HistoryScreenRoute);
+            //   },
+            // ),
+            // ListTile(
+            //   leading: Icon(Icons.hail_outlined),
+            //   title: Text('Switch As Driver'),
+            //   onTap: () {
+            //     // Navigator.pushNamed(context, SettingsScreenRoute);
+            //   },
+            // ),
+            // ListTile(
+            //   leading: Icon(Icons.person_pin_circle),
+            //   title: Text('Switch As HandyMan'),
+            //   onTap: () {
+            //     // Navigator.pushNamed(context, SettingsScreenRoute);
+            //   },
+            // ),
+            // ListTile(
+            //   leading: Icon(Icons.logout),
+            //   title: Text('Logout'),
+            //   onTap: () {
+            //     // Add your logout logic here
+            //   },
+            // ),
+          ],
+        ),
+      ),
+      
+*/

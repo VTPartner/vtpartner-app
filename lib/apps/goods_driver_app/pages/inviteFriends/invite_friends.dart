@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 
 import 'package:vt_partner/themes/themes.dart';
 
-class InviteFriendsScreen extends StatelessWidget {
-  const InviteFriendsScreen({super.key});
+class GoodsDriverInviteFriendsScreen extends StatelessWidget {
+  const GoodsDriverInviteFriendsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

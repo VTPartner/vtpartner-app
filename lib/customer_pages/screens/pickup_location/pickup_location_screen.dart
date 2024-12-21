@@ -38,7 +38,7 @@ class _PickupLocationScreenState extends State<PickupLocationScreen> {
   List<PredictedPlaces> _placesPredictedList = [];
   var hideSuggestion = false;
 
-Future<void> _getUserLocationAndAddress() async {
+  Future<void> _getUserLocationAndAddress() async {
     print("obtain address");
     try {
       Position position = await getUserCurrentLocation();
@@ -77,6 +77,7 @@ Future<void> _getUserLocationAndAddress() async {
       desiredAccuracy: LocationAccuracy.high,
     );
   }
+
   @override
   void initState() {
     super.initState();
@@ -127,7 +128,6 @@ Future<void> _getUserLocationAndAddress() async {
       });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -353,6 +353,7 @@ Future<void> _getUserLocationAndAddress() async {
               ),
             ),
           ),
+       
         ],
       ),
       bottomSheet: Container(

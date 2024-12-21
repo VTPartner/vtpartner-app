@@ -21,7 +21,7 @@ import 'package:intl/intl.dart';
 StreamSubscription<Position>? streamSubscriptionPosition;
 StreamSubscription<Position>? streamSubscriptionDriverLivePosition;
 Position? driverCurrentPosition;
-var devMode = 0; // Change this to 1 for development mode
+var devMode = 1; // Change this to 1 for development mode
 late String serverEndPoint;
 late String serverEndPointImage;
 
@@ -54,6 +54,8 @@ final serviceAccountFirebaseJson = {
       "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-cxenn%40vt-partner-4a2b1.iam.gserviceaccount.com",
   "universe_domain": "googleapis.com"
 };
+
+
 
 // final serviceAccountJson = {
 //   "type": "service_account",
@@ -124,7 +126,17 @@ void showSnackBar(BuildContext context, String text) {
 var customer_mobile_no = "";
 var delivery_agent_mobile_no = "";
 var booking_id = "";
+var customerId = "";
+var driverId = "";
+var pickupAddress = "";
+var category_id = 1;
+var subCategoryID = 1;
+var subCategoryName = "";
+var serviceId = 1;
+var serviceName = "";
 var order_id = "";
+var driverImage = "";
+var driverName = "";
 
 /// Converts a double precision epoch timestamp to a formatted date string
 /// Format: DD/MM/YYYY, HH:MM AM/PM
@@ -186,5 +198,28 @@ pleaseWaitDialog(BuildContext context) {
     },
   );
 }
+
+String getDayFromDate(String dateString) {
+  try {
+    // Parse the string into a DateTime object
+    DateTime inputDate = DateFormat("yyyy-MM-dd").parse(dateString);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final dateToCheck =
+        DateTime(inputDate.year, inputDate.month, inputDate.day);
+
+    if (dateToCheck == today) {
+      // Format as "Today, 10:25 am"
+      return "Today";
+    } else {
+      // Format as the day of the week
+      return DateFormat('EEE').format(inputDate); // e.g., "Monday"
+    }
+  } catch (e) {
+    // Handle parsing error
+    return "Invalid date format";
+  }
+}
+
 
 

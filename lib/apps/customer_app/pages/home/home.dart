@@ -11,6 +11,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
+import 'package:vt_partner/customer_pages/screens/main_screens/tab_pages/rides_screen_tab.dart';
+import 'package:vt_partner/customer_pages/screens/main_screens/tab_pages/settings_screen_tab.dart';
+import 'package:vt_partner/models/all_services_model.dart';
 import 'package:vt_partner/routings/route_names.dart';
 import 'package:vt_partner/themes/themes.dart';
 import 'package:vt_partner/apps/widgets/column_builder.dart';
@@ -24,6 +28,7 @@ import 'package:vt_partner/push_notifications/get_service_key.dart';
 import 'package:vt_partner/push_notifications/notification_service.dart';
 import 'package:vt_partner/global/global.dart' as glb;
 import 'package:http/http.dart' as http;
+import 'package:vt_partner/widgets/shimmer_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -64,6 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
   GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   late CameraPosition _currentPosition;
+  
 
   final placeList = [
     {
@@ -338,7 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> createMarkers(driversMarkerSet) async {
     for (ActiveNearByGoodsDrivers eachDriver in activeNearByGoodsDrivers) {
-      print("eachDriver::${eachDriver.locationLongitude}");
+      // print("eachDriver::${eachDriver.locationLongitude}");
       LatLng eachDriverActivePosition =
           LatLng(eachDriver.locationLatitude!, eachDriver.locationLongitude!);
       BitmapDescriptor customIcon =
@@ -350,20 +356,22 @@ class _HomeScreenState extends State<HomeScreen> {
         icon: customIcon,
         rotation: 360,
       );
-      print("marker::$marker");
+      // print("marker::$marker");
       driversMarkerSet.add(marker);
     }
-
+    if (userCurrentPosition != null) {
     driversMarkerSet.add(
       Marker(
         markerId: const MarkerId("your location"),
         position: LatLng(
             userCurrentPosition!.latitude, userCurrentPosition!.longitude),
         icon: BitmapDescriptor.fromBytes(
-          await getBytesFromAsset("assets/home/pickup_Location.png", 200),
+            await getBytesFromAsset("assets/home/pickup_Location.png", 200),
         ),
       ),
+    
     );
+    }
 
     setState(() {
       markersSet = driversMarkerSet;
@@ -540,6 +548,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .updateReceiverContactDetails(null);
   }
 
+
   onCameraMove(CameraPosition? position) {
     if (position != null) {
       _latitude = position.target.latitude;
@@ -568,23 +577,118 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  List<AllServicesModal> allServicesModel = [];
+  String? current_booking_id;
+
+  Future<void> fetchAllServices() async {
+// final data = {
+//       'mobile_no': "+91${glb.customer_mobile_no}",
+//     };
+
+    final pref = await SharedPreferences.getInstance();
+    setState(() {
+      current_booking_id = pref.getString("current_booking_id");
+      print("current_booking_id::$current_booking_id");
+    });
+    final appInfo = Provider.of<AppInfo>(context, listen: false);
+    var address = appInfo.userCurrentLocation?.locationName;
+    if (address == null || address.isEmpty) {
+      MyApp.restartApp(context);
+      // return;
+    }
+    setState(() {
+      _showBottomSheet = false;
+      allServicesModel = [];
+    });
+
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/all_services', {});
+      if (kDebugMode) {
+        // print(response);
+      }
+      // Check if the response contains 'results' key and parse it
+      if (response['results'] != null) {
+        List<dynamic> servicesData = response['results'];
+        // Map the list of service data into a list of Service objects
+        setState(() {
+          allServicesModel = servicesData
+              .map((serviceJson) => AllServicesModal.fromJson(serviceJson))
+              .toList();
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      if (e.toString().contains("No Data Found")) {
+        glb.showToast("No Services Found.");
+      } else {
+        //glb.showToast("An error occurred: ${e.toString()}");
+      }
+    } finally {}
+  }
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _resetLocations();
     // notificationService.requestNotificationPermission();
     getNotificationToken();
     checkServiceAvailable();
     //getOnlineGoodsDrivers();
-
+fetchAllServices();
     checkIfLocationPermissionAllowed();
     _getUserLocationAndAddress();
     _currentPosition = currentPosition;
     print("init pickup location map");
     _setUserLocationMarker(context);
-    _resetLocations();
+    
     //updateDriversLocationAtRealTime();
   }
+
+  final List cabType = ["Our Services"];
+
+  final List cabslist = [
+    {
+      "image": "assets/selectCab/cab1.png",
+      "name": "Sedan",
+      "price": 30.50,
+    },
+    {
+      "image": "assets/selectCab/cab2.png",
+      "name": "Nexon",
+      "price": 32.50,
+    },
+    {
+      "image": "assets/selectCab/cab3.png",
+      "name": "Baleno",
+      "price": 30.50,
+    },
+    {
+      "image": "assets/selectCab/cab4.png",
+      "name": "Sedan",
+      "price": 30.50,
+    },
+    {
+      "image": "assets/selectCab/cab5.png",
+      "name": "Nexon",
+      "price": 32.50,
+    },
+    {
+      "image": "assets/selectCab/cab6.png",
+      "name": "Baleno",
+      "price": 30.50,
+    }
+  ];
+
+  int selectedCab = 0;
+
+  int selectedCabtype = 0;
+
+  bool isMapLoading = true; // Track whether the map is loading
 
   @override
   Widget build(BuildContext context) {
@@ -600,19 +704,255 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Scaffold(
         key: scaffoldKey,
         drawer: drawer(size),
-        body: Stack(
-          children: [
-            googleMap(),
+        body: isLoading
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Shimmer.fromColors(
+                    baseColor: Colors.grey.withOpacity(0.2),
+                    highlightColor: Colors.grey.withOpacity(0.1),
+                    enabled: isLoading,
+                    child: const VTPartnerLoader(),
+                  ),
+                ],
+              )
+            : Stack(
+                children: [
+                  // Show map when loading is done
+                  // googleMap(),
+                  GoogleMap(
+                    padding: EdgeInsets.only(bottom: bottomPaddingOfMap),
+                    mapType: MapType.normal,
+                    myLocationEnabled: false, // Disable default blue dot
+                    zoomGesturesEnabled: true,
+                    zoomControlsEnabled: true,
+                    markers: markersSet, // Add custom markers here
+                    initialCameraPosition: _currentPosition,
+                    onMapCreated: (GoogleMapController controller) {
+                      print("MapCreating here completed");
+                      if (!_controller.isCompleted) {
+                        _controller.complete(controller);
+                      }
+                      setState(() {
+                        mapController = controller;
+                        bottomPaddingOfMap = 120.0;
+                      });
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        locateUserPosition();
+                      });
+                    },
+                  ),
             Padding(
               padding: const EdgeInsets.only(top: 25),
               child: currentLocationBox(context),
             ),
-            whereToGoBottomSheet(size),
-          ],
+                  // whereToGoBottomSheet(size),
+                  selectServicesBottomSheet(size)
+                ],
+              ),
+      ),
+    );
+  }
+
+  selectServicesBottomSheet(Size size) {
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      left: 0,
+      child: AnimationConfiguration.synchronized(
+        child: SlideAnimation(
+          curve: Curves.easeIn,
+          delay: const Duration(milliseconds: 350),
+          child: BottomSheet(
+            enableDrag: false,
+            backgroundColor: Colors.transparent,
+            onClosing: () {},
+            builder: (context) {
+              return Container(
+                width: double.maxFinite,
+                decoration: BoxDecoration(
+                  color: whiteColor,
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(25.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: blackColor.withOpacity(0.25),
+                      blurRadius: 15,
+                      offset: const Offset(10, 0),
+                    )
+                  ],
+                ),
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: EdgeInsets.zero,
+                  children: [
+                    heightSpace,
+                    heightSpace,
+                    Center(
+                      child: Container(
+                        width: 60,
+                        height: 5,
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                    heightSpace,
+                    height5Space,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0),
+                      child: Row(
+                        children: List.generate(
+                          cabType.length,
+                          (index) => Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedCabtype = index;
+                                });
+                              },
+                              child: Text(
+                                cabType[index],
+                                style: selectedCabtype == index
+                                    ? semibold18black
+                                    : semibold18Grey3,
+                                textAlign: TextAlign.left,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    height5Space,
+                    height5Space,
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: fixPadding),
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: List.generate(
+                          allServicesModel.length,
+                          (index) {
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedCab = index;
+                                });
+
+                                var category_id =
+                                    allServicesModel[index].categoryId;
+                                glb.category_id = category_id;
+                                if (category_id == 1)
+                                  Navigator.pushNamed(
+                                      context, PickUpAddressRoute);
+                                if (category_id == 2)
+                                  Navigator.pushNamed(
+                                      context, CabPickupLocationSearchRoute);
+                                if (category_id == 3)
+                                  Navigator.pushNamed(
+                                      context, HandyManAppAllServicesRoute);
+                                if (category_id == 4)
+                                  Navigator.pushNamed(
+                                      context, HandyManAppAllServicesRoute);
+                                if (category_id == 5)
+                                  Navigator.pushNamed(
+                                      context, HandyManAppAllServicesRoute);
+                              },
+                              child: Container(
+                                width: size.width * 0.28,
+                                height: 180,
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: fixPadding),
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Container(
+                                        height: 140,
+                                        width: double.maxFinite,
+                                        decoration: BoxDecoration(
+                                          color: whiteColor,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          border: Border.all(
+                                            color: lightGreyColor,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        Expanded(
+                                          child: Center(
+                                            child: Image.network(
+                                              allServicesModel[index]
+                                                  .categoryImage,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: fixPadding),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                allServicesModel[index]
+                                                    .categoryName,
+                                                style: semibold15black,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Icon(
+                                              Icons.check_circle,
+                                              color: selectedCab == index
+                                                  ? Colors.green
+                                                  : lightGreyColor,
+                                            ),
+                                          ],
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    heightSpace,
+                    heightSpace,
+                    heightSpace,
+                    height5Space,
+                    height5Space,
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
   }
+
 
   currentLocationButton() {
     return Align(
@@ -637,7 +977,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GoogleMap(
       padding: EdgeInsets.only(bottom: bottomPaddingOfMap),
       zoomControlsEnabled: true,
-      myLocationEnabled: true,
+      // myLocationEnabled: true,
       mapType: MapType.terrain,
       initialCameraPosition: currentPosition,
       onMapCreated: mapCreated,
@@ -647,14 +987,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   mapCreated(GoogleMapController controller) async {
+    print("mapCreated");
     mapController = controller;
     // await marker();
     _controller.complete(controller);
     setState(() {
-      bottomPaddingOfMap = 150.0;
+      bottomPaddingOfMap = 320.0;
     });
+    
+
     locateUserPosition();
-    setState(() {});
+    
+    
   }
 
   marker() async {
@@ -912,11 +1256,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Container(
                     height: size.height * 0.085,
                     width: size.height * 0.085,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       image: DecorationImage(
-                        image: AssetImage(
-                          "assets/home/User.png",
+                        image: NetworkImage(
+                          "https://vtpartner.org/media/image_YoRjcDi.jpg",
                         ),
                         fit: BoxFit.cover,
                       ),
@@ -928,8 +1272,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   top: 0,
                   child: InkWell(
                     onTap: () {
-                      Navigator.pushNamed(context, '/editProfile').then(
-                          (value) => scaffoldKey.currentState?.closeDrawer());
+                      // Navigator.pushNamed(context, GoodsDriverEditProfileRoute)
+                      //     .then((value) =>
+                      //         scaffoldKey.currentState?.closeDrawer());
                     },
                     child: Container(
                       height: size.height * 0.038,
@@ -940,7 +1285,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       alignment: Alignment.center,
                       child: const Icon(
-                        Icons.border_color,
+                        Icons.border_color_outlined,
                         size: 15,
                         color: primaryColor,
                       ),
@@ -951,20 +1296,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           widthSpace,
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Samantha Smith",
+                  "${_customer_name}",
                   style: bold16White,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  "samanthasmith@gmail.com",
-                  style: regular14White,
-                  overflow: TextOverflow.ellipsis,
-                )
               ],
             ),
           )
@@ -1021,44 +1361,36 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   drawerItems() {
+    final size = MediaQuery.of(context).size;
     return Expanded(
       child: ListView(
         padding: const EdgeInsets.all(fixPadding * 1.5),
         physics: const BouncingScrollPhysics(),
         children: [
           drawerItemWidget(Icons.home_rounded, "Home", () {
+
             scaffoldKey.currentState!.closeDrawer();
           }),
           divider(),
           drawerItemWidget(Icons.drive_eta, "My Rides", () {
-            Navigator.pushNamed(context, '/myride')
-                .then((value) => scaffoldKey.currentState!.closeDrawer());
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => RidesScreenTabPage()),
+            ).then((value) {
+              scaffoldKey.currentState?.closeDrawer();
+            });
+
           }),
           divider(),
-          drawerItemWidget(Icons.account_balance_wallet_rounded, "Wallet", () {
-            Navigator.pushNamed(context, '/wallet')
-                .then((value) => scaffoldKey.currentState!.closeDrawer());
+          drawerItemWidget(Icons.settings, "Settings", () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SettingsScreenTabPage()),
+            ).then((value) {
+              scaffoldKey.currentState?.closeDrawer();
+            });
           }),
-          divider(),
-          drawerItemWidget(Icons.notifications_sharp, "Notification", () {
-            Navigator.pushNamed(context, '/notification')
-                .then((value) => scaffoldKey.currentState!.closeDrawer());
-          }),
-          divider(),
-          drawerItemWidget(CupertinoIcons.gift_fill, "Invite Friends", () {
-            Navigator.pushNamed(context, '/invitefriends')
-                .then((value) => scaffoldKey.currentState!.closeDrawer());
-          }),
-          divider(),
-          drawerItemWidget(CupertinoIcons.question_circle_fill, "FAQs", () {
-            Navigator.pushNamed(context, '/faqs')
-                .then((value) => scaffoldKey.currentState!.closeDrawer());
-          }),
-          divider(),
-          drawerItemWidget(Icons.email, "Contact us", () {
-            Navigator.pushNamed(context, '/contactUs')
-                .then((value) => scaffoldKey.currentState!.closeDrawer());
-          }),
+          
           divider(),
           drawerItemWidget(
             Icons.logout,
@@ -1067,10 +1399,63 @@ class _HomeScreenState extends State<HomeScreen> {
               logoutDialog();
             },
           ),
+          divider(),
+          GestureDetector(
+            onTap: () {
+              // Navigator.pushNamed(context, CustomerMainScreenRoute)
+              //     .then((value) => scaffoldKey.currentState?.closeDrawer());
+              navigateToGoodsDriver();
+            },
+            child: Center(
+              child: Container(
+                margin: const EdgeInsets.all(fixPadding * 2.0),
+                width: size.width * 0.75,
+                padding: const EdgeInsets.all(fixPadding * 1.3),
+                decoration: BoxDecoration(
+                  color: primaryColor,
+                  boxShadow: buttonShadow,
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                child: const Text(
+                  "Switch to Goods Driver Mode",
+                  style: bold12White,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ),
+          )
+        
         ],
       ),
     );
   }
+
+  void navigateToGoodsDriver() async {
+    final pref = await SharedPreferences.getInstance();
+    var goods_driver_id = pref.getString("goods_driver_id");
+    var driver_name = pref.getString("driver_name");
+    if (goods_driver_id != null &&
+        driver_name != null &&
+        goods_driver_id.isNotEmpty &&
+        driver_name.isNotEmpty &&
+        driver_name != "NA") {
+      // Future.delayed(const Duration(milliseconds: 100), () {
+      //   glb.streamSubscriptionPosition?.cancel();
+      //   // MyApp.restartApp(context);
+      // });
+      scaffoldKey.currentState?.closeDrawer();
+      Navigator.pushReplacementNamed(context, AgentHomeScreenRoute);
+    } else {
+      // Future.delayed(const Duration(milliseconds: 100), () {
+      //   glb.streamSubscriptionPosition?.cancel();
+      //   // MyApp.restartApp(context);
+      // });
+      scaffoldKey.currentState?.closeDrawer();
+      Navigator.pushNamed(context, AgentLoginRoute);
+    }
+    //goods_driver_id,driver_name
+  }
+
 
   logoutDialog() {
     return showDialog(

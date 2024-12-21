@@ -161,3 +161,176 @@ class AllOrdersModel {
     };
   }
 }
+
+
+class AllOrdersModel2 {
+  String? booking_id;
+  String? customer_id;
+  String? driver_id;
+  String? pickup_lat;
+  String? pickup_lng;
+  String? destination_lat;
+  String? destination_lng;
+  String? distance;
+  String? total_time;
+  String? total_price;
+  String? base_price;
+  String? booking_timing;
+  String? booking_date;
+  String? booking_status;
+  String? driver_arrival_time;
+  String? otp;
+  String? gst_amount;
+  String? igst_amount;
+  String? goods_type_id;
+  String? payment_method;
+  String? city_id;
+  String? order_id;
+  String? sender_name;
+  String? sender_number;
+  String? receiver_name;
+  String? receiver_number;
+  String? driver_first_name;
+  String? goods_driver_auth_token;
+  String? customer_name;
+  String? customers_auth_token;
+  String? pickup_address;
+  String? drop_address;
+  String? customer_mobile_no;
+  String? driver_mobile_no;
+  String? vehicle_id;
+  String? vehicle_name;
+  String? vehicle_image;
+  String? ratings;
+  String? rating_description;
+
+  AllOrdersModel2({
+    required this.booking_id,
+    required this.customer_id,
+    required this.driver_id,
+    required this.pickup_lat,
+    required this.pickup_lng,
+    required this.destination_lat,
+    required this.destination_lng,
+    required this.distance,
+    required this.total_time,
+    required this.total_price,
+    required this.base_price,
+    required this.booking_timing,
+    required this.booking_date,
+    required this.booking_status,
+    required this.driver_arrival_time,
+    required this.otp,
+    required this.gst_amount,
+    required this.igst_amount,
+    required this.goods_type_id,
+    required this.payment_method,
+    required this.city_id,
+    required this.order_id,
+    required this.sender_name,
+    required this.sender_number,
+    required this.receiver_name,
+    required this.receiver_number,
+    required this.driver_first_name,
+    required this.goods_driver_auth_token,
+    required this.customer_name,
+    required this.customers_auth_token,
+    required this.pickup_address,
+    required this.drop_address,
+    required this.customer_mobile_no,
+    required this.driver_mobile_no,
+    required this.vehicle_id,
+    required this.vehicle_name,
+    required this.vehicle_image,
+    required this.ratings,
+    required this.rating_description,
+  });
+
+  factory AllOrdersModel2.fromJson(Map<String, dynamic> json) {
+    return AllOrdersModel2(
+      booking_id: json['booking_id'],
+      customer_id: json['customer_id'],
+      driver_id: json['driver_id'],
+      pickup_lat: json['pickup_lat'],
+      pickup_lng: json['pickup_lng'],
+      destination_lat: json['destination_lat'],
+      destination_lng: json['destination_lng'],
+      distance: json['distance'],
+      total_time: json['total_time'],
+      total_price: json['total_price'],
+      base_price: json['base_price'],
+      booking_timing: json['booking_timing'],
+      booking_date: json['booking_date'],
+      booking_status: json['booking_status'],
+      driver_arrival_time: json['driver_arrival_time'],
+      otp: json['otp'],
+      gst_amount: json['gst_amount'],
+      igst_amount: json['igst_amount'],
+      goods_type_id: json['goods_type_id'],
+      payment_method: json['payment_method'],
+      city_id: json['city_id'],
+      order_id: json['order_id'],
+      sender_name: json['sender_name'],
+      sender_number: json['sender_number'],
+      receiver_name: json['receiver_name'],
+      receiver_number: json['receiver_number'],
+      driver_first_name: json['driver_first_name'],
+      goods_driver_auth_token: json['goods_driver_auth_token'],
+      customer_name: json['customer_name'],
+      customers_auth_token: json['customers_auth_token'],
+      pickup_address: json['pickup_address'],
+      drop_address: json['drop_address'],
+      customer_mobile_no: json['customer_mobile_no'],
+      driver_mobile_no: json['driver_mobile_no'],
+      vehicle_id: json['vehicle_id'],
+      vehicle_name: json['vehicle_name'],
+      vehicle_image: json['vehicle_image'],
+      ratings: json['ratings'],
+      rating_description: json['rating_description'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "booking_id": booking_id,
+      "customer_id": customer_id,
+      "driver_id": driver_id,
+      "pickup_lat": pickup_lat,
+      "pickup_lng": pickup_lng,
+      "destination_lat": destination_lat,
+      "destination_lng": destination_lng,
+      "distance": distance,
+      "total_time": total_time,
+      "total_price": total_price,
+      "base_price": base_price,
+      "booking_timing": booking_timing,
+      "booking_date": booking_date,
+      "booking_status": booking_status,
+      "driver_arrival_time": driver_arrival_time,
+      "otp": otp,
+      "gst_amount": gst_amount,
+      "igst_amount": igst_amount,
+      "goods_type_id": goods_type_id,
+      "payment_method": payment_method,
+      "city_id": city_id,
+      "order_id": order_id,
+      "sender_name": sender_name,
+      "sender_number": sender_number,
+      "receiver_name": receiver_name,
+      "receiver_number": receiver_number,
+      "driver_first_name": driver_first_name,
+      "goods_driver_auth_token": goods_driver_auth_token,
+      "customer_name": customer_name,
+      "customers_auth_token": customers_auth_token,
+      "pickup_address": pickup_address,
+      "drop_address": drop_address,
+      "customer_mobile_no": customer_mobile_no,
+      "driver_mobile_no": driver_mobile_no,
+      "vehicle_id": vehicle_id,
+      "vehicle_name": vehicle_name,
+      "vehicle_image": vehicle_image,
+      "ratings": ratings,
+      "rating_description": rating_description,
+    };
+  }
+}

@@ -235,6 +235,9 @@ const TextStyle semibold15White =
 const TextStyle semibold14Grey =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: greyColor);
 
+const TextStyle semibold10Grey =
+    TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: greyColor);
+
 const TextStyle semibold15Grey =
     TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: greyColor);
 
@@ -243,6 +246,12 @@ const TextStyle semibold16Grey =
 
 const TextStyle semibold14Black =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: blackColor);
+
+const TextStyle semibold10Black =
+    TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: blackColor);
+
+const TextStyle semibold12Black =
+    TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: blackColor);
 
 const TextStyle semibold15Black =
     TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: blackColor);
@@ -267,6 +276,8 @@ const TextStyle bold16Black =
 
 const TextStyle bold18White =
     TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: whiteColor);
+
+
 
 const TextStyle bold12Primary =
     TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: primaryColor);
@@ -328,6 +339,9 @@ const TextStyle regular12Grey =
 const TextStyle regular15Grey =
     TextStyle(fontSize: 15, fontWeight: FontWeight.w400, color: greyColor);
 
+const TextStyle regular8White =
+    TextStyle(fontSize: 8, fontWeight: FontWeight.w400, color: whiteColor);
+
 const TextStyle regular14White =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: whiteColor);
 
@@ -336,3 +350,12 @@ const TextStyle regular16Black =
 
 const TextStyle semibold18Grey3 =
     TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: greyShade3);
+
+const TextStyle semibold18black =
+    TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: blackColor);
+
+const TextStyle semibold15black =
+    TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: blackColor);
+
+const TextStyle semibold16black =
+    TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: blackColor);

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:vt_partner/themes/themes.dart';
 
-class NotificationScreen extends StatefulWidget {
-  const NotificationScreen({super.key});
+class GoodsDriverNotificationScreen extends StatefulWidget {
+  const GoodsDriverNotificationScreen({super.key});
 
   @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
+  State<GoodsDriverNotificationScreen> createState() =>
+      _GoodsDriverNotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _GoodsDriverNotificationScreenState
+    extends State<GoodsDriverNotificationScreen> {
   final notificationList = [
     {
       "image": "assets/notification/close.png",

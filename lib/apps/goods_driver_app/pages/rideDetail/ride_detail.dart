@@ -11,14 +11,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import 'package:vt_partner/themes/themes.dart';
 
-class RideDetailScreen extends StatefulWidget {
-  const RideDetailScreen({super.key});
+class GoodsDriverRideDetailScreen extends StatefulWidget {
+  const GoodsDriverRideDetailScreen({super.key});
 
   @override
-  State<RideDetailScreen> createState() => _RideDetailScreenState();
+  State<GoodsDriverRideDetailScreen> createState() => _GoodsDriverRideDetailScreenState();
 }
 
-class _RideDetailScreenState extends State<RideDetailScreen> {
+class _GoodsDriverRideDetailScreenState extends State<GoodsDriverRideDetailScreen> {
   final CustomInfoWindowController _customInfoWindowController =
       CustomInfoWindowController();
   GoogleMapController? mapController;

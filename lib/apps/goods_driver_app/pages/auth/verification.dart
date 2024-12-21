@@ -32,7 +32,7 @@ class _GoodsDriverVerificationScreenState
 
   Future<void> loginAsync() async {
     final data = {
-      'mobile_no': "${glb.delivery_agent_mobile_no}",
+      'mobile_no': "+${glb.delivery_agent_mobile_no}",
     };
 
     final pref = await SharedPreferences.getInstance();

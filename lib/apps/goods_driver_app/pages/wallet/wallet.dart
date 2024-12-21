@@ -3,14 +3,15 @@ import 'package:vt_partner/apps/widgets/column_builder.dart';
 
 import 'package:vt_partner/themes/themes.dart';
 
-class WalletScreen extends StatefulWidget {
-  const WalletScreen({super.key});
+class GoodsDriverWalletScreen extends StatefulWidget {
+  const GoodsDriverWalletScreen({super.key});
 
   @override
-  State<WalletScreen> createState() => _WalletScreenState();
+  State<GoodsDriverWalletScreen> createState() =>
+      _GoodsDriverWalletScreenState();
 }
 
-class _WalletScreenState extends State<WalletScreen> {
+class _GoodsDriverWalletScreenState extends State<GoodsDriverWalletScreen> {
   final transactionList = [
     {
       "image": "assets/wallet/Image1.png",

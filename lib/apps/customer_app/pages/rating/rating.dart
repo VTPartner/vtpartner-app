@@ -1,5 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vt_partner/assistants/request_assistance.dart';
 import 'package:vt_partner/themes/themes.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
 class RatingScreen extends StatefulWidget {
   const RatingScreen({super.key});
@@ -10,6 +14,37 @@ class RatingScreen extends StatefulWidget {
 
 class _RatingScreenState extends State<RatingScreen> {
   int selectedRate = 3;
+final TextEditingController _complimentController = TextEditingController();
+  var ratings_description = 'NA';
+
+  Future<void> saveRatings() async {
+    final pref = await SharedPreferences.getInstance();
+    glb.pleaseWaitDialog(context);
+    ratings_description = _complimentController.text.toString().trim();
+    if (ratings_description.isEmpty) ratings_description = "NA";
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/save_order_ratings', {
+        'order_id': glb.order_id,
+        'ratings': selectedRate,
+        'ratings_description': ratings_description
+      });
+      if (kDebugMode) {
+        print(response);
+      }
+      glb.showSnackBar(
+          context, "Thank you for sharing your valuable feedback and rating.");
+      Navigator.pop(context);
+      Navigator.pop(context);
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    } finally {
+      Navigator.pop(context);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +88,14 @@ class _RatingScreenState extends State<RatingScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: backHomeButton(context),
+      // bottomNavigationBar: backHomeButton(context),
+      // bottomNavigationBar: submitButton(size),
     );
   }
 
   drivername() {
-    return const Text(
-      "Cameron Williamson",
+    return Text(
+      glb.driverName,
       style: semibold17Black,
       textAlign: TextAlign.center,
     );
@@ -67,7 +103,7 @@ class _RatingScreenState extends State<RatingScreen> {
 
   rateTexr() {
     return Text(
-      "You rated ${selectedRate + 1} star to Cameron",
+      "You rated ${selectedRate + 1} star to ${glb.driverName}",
       style: regular16Grey,
       textAlign: TextAlign.center,
     );
@@ -105,9 +141,10 @@ class _RatingScreenState extends State<RatingScreen> {
         borderRadius: BorderRadius.circular(5.0),
         border: Border.all(color: lightGreyColor),
       ),
-      child: const TextField(
+      child: TextField(
+        controller: _complimentController,
         cursorColor: primaryColor,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
               horizontal: fixPadding * 2, vertical: fixPadding * 1.5),
@@ -121,7 +158,7 @@ class _RatingScreenState extends State<RatingScreen> {
   submitButton(Size size) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/home');
+        saveRatings();
       },
       child: Center(
         child: Container(
@@ -171,8 +208,9 @@ class _RatingScreenState extends State<RatingScreen> {
       width: 100,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        image: const DecorationImage(
-          image: AssetImage("assets/driverDetail/Image.png"),
+        image: DecorationImage(
+          image: NetworkImage(glb.driverImage),
+          // image: AssetImage("assets/driverDetail/Image.png"),
         ),
         boxShadow: [
           BoxShadow(
@@ -181,30 +219,33 @@ class _RatingScreenState extends State<RatingScreen> {
           )
         ],
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
-            clipBehavior: Clip.hardEdge,
-            width: double.maxFinite,
-            padding: const EdgeInsets.symmetric(vertical: fixPadding / 2),
-            decoration: BoxDecoration(
-              color: blackColor.withOpacity(0.35),
+      child: Visibility(
+        visible: false,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              clipBehavior: Clip.hardEdge,
+              width: double.maxFinite,
+              padding: const EdgeInsets.symmetric(vertical: fixPadding / 2),
+              decoration: BoxDecoration(
+                color: blackColor.withOpacity(0.35),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("4.7", style: bold12White),
+                  width5Space,
+                  Icon(
+                    Icons.star,
+                    size: 16,
+                    color: yellowColor,
+                  )
+                ],
+              ),
             ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("4.7", style: bold12White),
-                width5Space,
-                Icon(
-                  Icons.star,
-                  size: 16,
-                  color: yellowColor,
-                )
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

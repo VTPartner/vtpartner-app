@@ -1,80 +1,77 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:vt_partner/assistants/request_assistance.dart';
+import 'package:vt_partner/customer_pages/models/all_orders_model.dart';
 import 'package:vt_partner/themes/themes.dart';
+import 'package:vt_partner/global/global.dart' as glb;
 
-class MyRatingScreen extends StatefulWidget {
-  const MyRatingScreen({super.key});
+class GoodsDriverRatingScreen extends StatefulWidget {
+  const GoodsDriverRatingScreen({super.key});
 
   @override
-  State<MyRatingScreen> createState() => _MyRatingScreenState();
+  State<GoodsDriverRatingScreen> createState() =>
+      _GoodsDriverRatingScreenState();
 }
 
-class _MyRatingScreenState extends State<MyRatingScreen> {
-  final ratingList = [
-    {
-      "image": "assets/rating/Image1.png",
-      "name": "Theresa Webb",
-      "time": "Today, 10:25 am",
-      "rate": 4.7,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image2.png",
-      "name": "Cody Fisher",
-      "time": "Thu 11 Jun, 2020 02:22 am",
-      "rate": 4.5,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image3.png",
-      "name": "Jacob Jones",
-      "time": "Fri 26 Jun, 2020 10:30 pm",
-      "rate": 4.0,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image4.png",
-      "name": "Jenny Wilson",
-      "time": "Mon 29 Jun, 2020 07:40 am",
-      "rate": 4.7,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image5.png",
-      "name": "Brooklyn Simmons",
-      "time": "Fri 26 Jun, 2020 12:30 am",
-      "rate": 4.2,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image6.png",
-      "name": "Kristin Watson",
-      "time": "Tue 23 Jun, 2020 01:17 pm",
-      "rate": 4.5,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image7.png",
-      "name": "Savannah Nguyen",
-      "time": "Mon 01 Jun, 2020 05:05 pm",
-      "rate": 4.7,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-    {
-      "image": "assets/rating/Image8.png",
-      "name": "Leslie Alexander",
-      "time": "Wed 17 Jun, 2020 07:39 am",
-      "rate": 4.2,
-      "review":
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit amiPharetra in elementum duis justo nulla"
-    },
-  ];
+class _GoodsDriverRatingScreenState extends State<GoodsDriverRatingScreen> {
+  bool isLoading = true, noOrdersFound = true;
+  List<AllOrdersModel2> allOrdersModel = [];
+
+  Future<void> fetchAllOrders() async {
+    final pref = await SharedPreferences.getInstance();
+    var goods_driver_id = pref.getString("goods_driver_id");
+    final data = {
+      'driver_id': goods_driver_id,
+    };
+
+    setState(() {
+      isLoading = true;
+      allOrdersModel = [];
+    });
+
+    try {
+      final response = await RequestAssistant.postRequest(
+          '${glb.serverEndPoint}/goods_driver_all_orders', data);
+      if (kDebugMode) {
+        print(response);
+      }
+      // Check if the response contains 'results' key and parse it
+      if (response['results'] != null) {
+        List<dynamic> ordersData = response['results'];
+        // Map the list of service data into a list of Service objects
+        setState(() {
+          allOrdersModel = ordersData
+              .map((serviceJson) => AllOrdersModel2.fromJson(serviceJson))
+              .toList();
+          noOrdersFound = false;
+        });
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      if (e.toString().contains("No Data Found")) {
+        // glb.showToast("No Orders History Found.");
+        setState(() {
+          noOrdersFound = true;
+        });
+      } else {
+        //glb.showToast("An error occurred: ${e.toString()}");
+      }
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllOrders();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,9 +97,10 @@ class _MyRatingScreenState extends State<MyRatingScreen> {
     return ListView.builder(
       padding: const EdgeInsets.symmetric(horizontal: fixPadding * 2.0),
       physics: const BouncingScrollPhysics(),
-      itemCount: ratingList.length,
+      itemCount: allOrdersModel.length,
       itemBuilder: (context, index) {
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(vertical: fixPadding * 2.0),
@@ -111,32 +109,19 @@ class _MyRatingScreenState extends State<MyRatingScreen> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        height: 50,
-                        width: 50,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage(
-                              ratingList[index]['image'].toString(),
-                            ),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      widthSpace,
-                      width5Space,
+                      
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              ratingList[index]['name'].toString(),
+                              allOrdersModel[index].customer_name.toString(),
                               style: semibold16Black,
                               overflow: TextOverflow.ellipsis,
                             ),
                             Text(
-                              ratingList[index]['time'].toString(),
+                              glb.formatEpochToDateTime(double.parse(
+                                  allOrdersModel[index].booking_timing!)),
                               style: regular14Grey,
                             )
                           ],
@@ -152,7 +137,7 @@ class _MyRatingScreenState extends State<MyRatingScreen> {
                         child: Row(
                           children: [
                             Text(
-                              ratingList[index]['rate'].toString(),
+                              allOrdersModel[index].ratings!,
                               style: bold12White,
                             ),
                             width5Space,
@@ -167,14 +152,17 @@ class _MyRatingScreenState extends State<MyRatingScreen> {
                     ],
                   ),
                   heightSpace,
-                  Text(
-                    ratingList[index]['review'].toString(),
+                  allOrdersModel[index].rating_description != "NA"
+                      ? Text(
+                          allOrdersModel[index].rating_description!,
                     style: semibold14Grey,
-                  )
+                          textAlign: TextAlign.left,
+                        )
+                      : SizedBox()
                 ],
               ),
             ),
-            ratingList.length == index + 1
+            allOrdersModel.length == index + 1
                 ? const SizedBox()
                 : Container(
                     height: 1,
